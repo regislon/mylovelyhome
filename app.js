@@ -210,20 +210,7 @@ function setupFloorPlanClickListener() {
 
     const level = currentLevel || (validPanoramas[currentPanoramaIndex]?.level);
 
-    // First check if click is inside an area polygon
-    const clickedArea = allAreas.find(area => {
-      const polygonData = area.polygon || area.polygon_wkt;
-      return area.level === level &&
-             polygonData &&
-             isPointInPolygon(x, y, polygonData);
-    });
-
-    if (clickedArea) {
-      loadAreaDescription(clickedArea);
-      return;
-    }
-
-    // If not in area, check for panorama markers
+    // First check for panorama markers (priority over areas)
     const clickRadius = 15; // pixels
     const clicked = validPanoramas.find((p) => {
       if (p.level !== level) return false;
@@ -238,6 +225,19 @@ function setupFloorPlanClickListener() {
     if (clicked) {
       const index = validPanoramas.indexOf(clicked);
       loadPanorama(index);
+      return;
+    }
+
+    // If not on panorama marker, check if inside an area polygon
+    const clickedArea = allAreas.find(area => {
+      const polygonData = area.polygon || area.polygon_wkt;
+      return area.level === level &&
+             polygonData &&
+             isPointInPolygon(x, y, polygonData);
+    });
+
+    if (clickedArea) {
+      loadAreaDescription(clickedArea);
     }
   });
 }
@@ -326,9 +326,6 @@ async function loadAreaDescription(area) {
         const html = convertMarkdownToHTML(markdown);
         markdownContainer.innerHTML = `
           <div style="max-width: 800px; margin: 0 auto;">
-            <button onclick="closeMarkdownView()" style="margin-bottom: 20px; padding: 10px 20px; cursor: pointer;">
-              ← Back to Panorama
-            </button>
             <h1>${area.name_en || area.name_fr || 'Area Information'}</h1>
             ${html}
           </div>

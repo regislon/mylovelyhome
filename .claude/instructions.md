@@ -100,7 +100,7 @@ The application may optionally load a second file named **`areas.csv`** located 
 * when the user unselect one Walking_person_top_view.svg, I want it keep the orientation it had before being unselected.
 * display the area polygons from `areas.csv` on the floor plan. with transparent fill and colored border and put them bellow the svg icons.
 * when the use click on an area polygon, load and display the corresponding markdown description in the right panel, instead of the panorama.
-
+* when the use click on the  Walking_person_top_view.svg that is on top of an area polygon, load the panorama as usual (do not load the area description). 
 
 ### **Right Panel: 360° Viewer with Navigation Hotspots**
 
@@ -110,6 +110,7 @@ The application may optionally load a second file named **`areas.csv`** located 
 * Transitions should be smooth (fade or default Photo Sphere Viewer behavior).
 * A dropdown menu must also be available to jump directly to any panorama.
 * The zoom must be the lower by default when loading a panorama.
+* limit 
 
 
 
