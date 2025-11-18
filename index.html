@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>360° Panorama Viewer</title>
+
+  <!-- Photo Sphere Viewer CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.11.1/index.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Top Menu -->
+    <div id="top-menu">
+      <div id="controls">
+        <label for="level-select">Floor:</label>
+        <select id="level-select">
+          <option value="">All Levels</option>
+        </select>
+        <label for="panorama-select">Jump to:</label>
+        <select id="panorama-select">
+          <option value="">Select a location...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+      <!-- Left Panel: Floor Plan -->
+      <div id="floor-plan-panel">
+        <h3 id="floor-plan-title">Floor Plan</h3>
+        <div id="floor-plan-container">
+          <canvas id="floor-plan-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Right Panel: 360° Viewer -->
+      <div id="viewer-panel">
+        <div id="viewer-container"></div>
+      </div>
+    </div>
+
+    <!-- Loading and Error States -->
+    <div id="loading">Loading panoramas...</div>
+    <div id="error" style="display: none;"></div>
+  </div>
+
+  <!-- Import Map for ES Modules -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.11.1/index.module.js",
+        "@photo-sphere-viewer/markers-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.11.1/index.module.js"
+      }
+    }
+  </script>
+
+  <!-- PapaParse for CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- Application script -->
+  <script src="app.js" type="module"></script>
+</body>
+</html>

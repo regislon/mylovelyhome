@@ -1,0 +1,12 @@
+{
+  "projectInfo": {
+    "name": "equirectangular",
+    "description": "Equirectangular projection project"
+  },
+  "preferences": {
+    "codeStyle": {
+      "indentation": "spaces",
+      "indentSize": 2
+    }
+  }
+}
