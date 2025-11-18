@@ -11,6 +11,8 @@ let viewer = null;
 let floorPlanImage = null;
 let walkingPersonIcon = null;
 let currentFloorPlanLevel = null;
+let allAreas = []; // All areas from areas.csv
+let currentViewMode = 'panorama'; // 'panorama' or 'area'
 
 // DOM elements
 const viewerContainer = document.getElementById('viewer-container');
@@ -27,8 +29,9 @@ async function init() {
   try {
     showLoading(true);
 
-    // Load and parse CSV
+    // Load and parse CSV files
     allPanoramas = await loadPanoramas();
+    allAreas = await loadAreas();
 
     // Filter to only valid panoramas (with complete data)
     validPanoramas = allPanoramas.filter(p => {
@@ -83,6 +86,28 @@ function loadPanoramas() {
       },
       error: (error) => {
         reject(new Error(`CSV parsing failed: ${error.message}`));
+      }
+    });
+  });
+}
+
+// Load and parse areas CSV file
+function loadAreas() {
+  return new Promise((resolve, reject) => {
+    Papa.parse('areas.csv', {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (results.errors.length > 0) {
+          console.warn('Areas CSV parsing warnings:', results.errors);
+        }
+        console.log(`Loaded ${results.data.length} areas`);
+        resolve(results.data);
+      },
+      error: (error) => {
+        console.warn('areas.csv not found or failed to load');
+        resolve([]); // Return empty array if file doesn't exist
       }
     });
   });
@@ -145,6 +170,35 @@ function setupPanoramaSelectListener() {
   });
 }
 
+// Check if point is inside polygon
+function isPointInPolygon(x, y, polygonData) {
+  // Parse polygon
+  let points;
+  if (polygonData.startsWith('POLYGON')) {
+    points = parseWKTPolygon(polygonData);
+    if (!points) return false;
+  } else {
+    const coords = polygonData.split(',').map(v => parseFloat(v.trim()));
+    if (coords.length < 6) return false;
+    points = [];
+    for (let i = 0; i < coords.length; i += 2) {
+      points.push([coords[i], coords[i + 1]]);
+    }
+  }
+
+  // Point-in-polygon algorithm
+  let inside = false;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const xi = points[i][0], yi = points[i][1];
+    const xj = points[j][0], yj = points[j][1];
+
+    const intersect = ((yi > y) !== (yj > y)) &&
+      (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
 // Setup floor plan canvas click listener
 function setupFloorPlanClickListener() {
   floorPlanCanvas.addEventListener('click', (event) => {
@@ -154,10 +208,23 @@ function setupFloorPlanClickListener() {
     const x = (event.clientX - rect.left) * scaleX;
     const y = (event.clientY - rect.top) * scaleY;
 
-    // Find panorama near click position
-    const clickRadius = 15; // pixels
     const level = currentLevel || (validPanoramas[currentPanoramaIndex]?.level);
 
+    // First check if click is inside an area polygon
+    const clickedArea = allAreas.find(area => {
+      const polygonData = area.polygon || area.polygon_wkt;
+      return area.level === level &&
+             polygonData &&
+             isPointInPolygon(x, y, polygonData);
+    });
+
+    if (clickedArea) {
+      loadAreaDescription(clickedArea);
+      return;
+    }
+
+    // If not in area, check for panorama markers
+    const clickRadius = 15; // pixels
     const clicked = validPanoramas.find((p) => {
       if (p.level !== level) return false;
 
@@ -231,12 +298,95 @@ function loadWalkingPersonIconAsync() {
   });
 }
 
+// Load and display area description
+async function loadAreaDescription(area) {
+  console.log('Loading area description:', area);
+  currentViewMode = 'area';
+
+  // Hide viewer, show markdown container
+  viewerContainer.style.display = 'none';
+
+  // Create or get markdown container
+  let markdownContainer = document.getElementById('markdown-container');
+  if (!markdownContainer) {
+    markdownContainer = document.createElement('div');
+    markdownContainer.id = 'markdown-container';
+    markdownContainer.style.cssText = 'width: 100%; height: 100%; padding: 20px; overflow-y: auto; background: white; box-sizing: border-box;';
+    viewerContainer.parentElement.appendChild(markdownContainer);
+  }
+  markdownContainer.style.display = 'block';
+
+  // Load markdown file
+  if (area.description_file && area.description_file.trim() !== '') {
+    try {
+      const response = await fetch(area.description_file);
+      if (response.ok) {
+        const markdown = await response.text();
+        // Simple markdown rendering (convert to HTML)
+        const html = convertMarkdownToHTML(markdown);
+        markdownContainer.innerHTML = `
+          <div style="max-width: 800px; margin: 0 auto;">
+            <button onclick="closeMarkdownView()" style="margin-bottom: 20px; padding: 10px 20px; cursor: pointer;">
+              ← Back to Panorama
+            </button>
+            <h1>${area.name_en || area.name_fr || 'Area Information'}</h1>
+            ${html}
+          </div>
+        `;
+      } else {
+        markdownContainer.innerHTML = `<p>Description file not found: ${area.description_file}</p>`;
+      }
+    } catch (error) {
+      console.error('Failed to load markdown:', error);
+      markdownContainer.innerHTML = `<p>Error loading description.</p>`;
+    }
+  } else {
+    markdownContainer.innerHTML = `
+      <h1>${area.name_en || area.name_fr || 'Area'}</h1>
+      <p>No description available.</p>
+    `;
+  }
+}
+
+// Simple markdown to HTML converter
+function convertMarkdownToHTML(markdown) {
+  return markdown
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*)\*/gim, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^(.+)$/gim, '<p>$1</p>')
+    .replace(/<p><h/g, '<h')
+    .replace(/<\/h(\d)><\/p>/g, '</h$1>');
+}
+
+// Close markdown view and return to panorama
+window.closeMarkdownView = function() {
+  currentViewMode = 'panorama';
+  const markdownContainer = document.getElementById('markdown-container');
+  if (markdownContainer) {
+    markdownContainer.style.display = 'none';
+  }
+  viewerContainer.style.display = 'block';
+};
+
 // Load a specific panorama by index
 function loadPanorama(index) {
   if (index < 0 || index >= validPanoramas.length) {
     console.warn('Invalid panorama index:', index);
     return;
   }
+
+  // Switch to panorama mode
+  currentViewMode = 'panorama';
+  const markdownContainer = document.getElementById('markdown-container');
+  if (markdownContainer) {
+    markdownContainer.style.display = 'none';
+  }
+  viewerContainer.style.display = 'block';
 
   currentPanoramaIndex = index;
   const panorama = validPanoramas[index];
@@ -367,6 +517,76 @@ function loadFloorPlan(level) {
   img.src = floorPlanPath;
 }
 
+// Parse WKT POLYGON format
+function parseWKTPolygon(wkt) {
+  // Extract coordinates from "POLYGON((x1 y1, x2 y2, ...))"
+  const match = wkt.match(/POLYGON\(\((.*?)\)\)/);
+  if (!match) return null;
+
+  const points = match[1].split(',').map(pair => {
+    const [x, y] = pair.trim().split(/\s+/).map(v => parseFloat(v));
+    return [x, y];
+  });
+
+  return points;
+}
+
+// Draw area polygons on floor plan
+function drawAreaPolygons(areas) {
+  areas.forEach(area => {
+    console.log('Drawing area:', area.name_en || area.area_id);
+
+    // Support both 'polygon' and 'polygon_wkt' columns
+    const polygonData = area.polygon || area.polygon_wkt;
+    if (!polygonData || polygonData.trim() === '') {
+      console.warn('Area missing polygon:', area);
+      return;
+    }
+
+    // Parse polygon - either WKT format or comma-separated
+    let points;
+    if (polygonData.startsWith('POLYGON')) {
+      points = parseWKTPolygon(polygonData);
+      if (!points) {
+        console.warn('Failed to parse WKT polygon:', polygonData);
+        return;
+      }
+    } else {
+      // Parse comma-separated: "x1,y1,x2,y2,..."
+      const coords = polygonData.split(',').map(v => parseFloat(v.trim()));
+      if (coords.length < 6) {
+        console.warn('Polygon has too few points:', coords.length);
+        return;
+      }
+      points = [];
+      for (let i = 0; i < coords.length; i += 2) {
+        points.push([coords[i], coords[i + 1]]);
+      }
+    }
+
+    console.log('Polygon points:', points);
+
+    // Draw polygon
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i][0], points[i][1]);
+    }
+    ctx.closePath();
+
+    // Fill with transparent color
+    const fillColor = area.fill_color || 'rgba(100, 150, 200, 0.2)';
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+
+    // Border with color
+    const borderColor = area.border_color || area.color || '#4299e1';
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+}
+
 // Draw floor plan with panorama markers
 function drawFloorPlan(level) {
   if (!floorPlanImage) return;
@@ -376,6 +596,11 @@ function drawFloorPlan(level) {
 
   // Draw floor plan image
   ctx.drawImage(floorPlanImage, 0, 0);
+
+  // Draw area polygons for this level (below icons)
+  const areasOnLevel = allAreas.filter(a => a.level === level);
+  console.log(`Drawing ${areasOnLevel.length} areas for level ${level}`, areasOnLevel);
+  drawAreaPolygons(areasOnLevel);
 
   // Draw panorama markers for this level
   const panoramasOnLevel = validPanoramas.filter(p => p.level === level);

@@ -1,0 +1,2 @@
+  area_id,level,name_en,name_fr,polygon_wkt,description_file
+  salon,level2,Living Room,Salon,"POLYGON((71 118, 72 441, 241 444, 244 124,  71 118))",./descriptions/salon.md

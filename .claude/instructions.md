@@ -47,11 +47,13 @@ No other external library should be used unless it is CDN-based and installation
 
 ## **3. CSV Structure**
 
+
+### **3.1 assets CSV Structure**
+
 The application must load a file named **`assets.csv`** located at the project root.
 
 Only panoramas whose `file_path`, `position_x`, `position_y`, and `level` columns are **not empty** should be displayed.
 
-### **3.1 Required Columns**
 
 | Column       | Description                                            |
 | ------------ | ------------------------------------------------------ |
@@ -60,6 +62,23 @@ Only panoramas whose `file_path`, `position_x`, `position_y`, and `level` column
 | `position_y` | Y-coordinate of the panorama within the floor plan.    |
 | `level`      | Floor number associated with the panorama.             |
 | `orientation`      | Orientation of the panorama in degree from the north.             |
+
+
+
+### **3.2 Areas CSV Structure**
+
+The application may optionally load a second file named **`areas.csv`** located at the project root.
+
+| Column | Description |
+| ------ | ----------- |
+| `level` | Floor number associated with the area. |
+| `polygon_wkt` | Polygon in Well-Known Text format representing the area on the floor plan. |
+| `description_file` | Relative path to a markdown file containing the description of the area. |
+| `area_id` | Unique identifier for the area. |
+| `name_en` | Name of the area in English. |
+| `name_fr` | Name of the area in French. |
+
+
 
 ---
 
@@ -79,6 +98,8 @@ Only panoramas whose `file_path`, `position_x`, `position_y`, and `level` column
 * when the user rotates the panorama, the icon representing the current panorama on the floor plan must rotate accordingly to reflect the current orientation.
 * When the user clicks a panorama marker on the floor plan, the corresponding panorama must be loaded.
 * when the user unselect one Walking_person_top_view.svg, I want it keep the orientation it had before being unselected.
+* display the area polygons from `areas.csv` on the floor plan. with transparent fill and colored border and put them bellow the svg icons.
+* when the use click on an area polygon, load and display the corresponding markdown description in the right panel, instead of the panorama.
 
 
 ### **Right Panel: 360° Viewer with Navigation Hotspots**
