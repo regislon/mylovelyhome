@@ -158,7 +158,7 @@ function setupFloorPlanClickListener() {
     const clickRadius = 15; // pixels
     const level = currentLevel || (validPanoramas[currentPanoramaIndex]?.level);
 
-    const clicked = validPanoramas.find((p, index) => {
+    const clicked = validPanoramas.find((p) => {
       if (p.level !== level) return false;
 
       const px = parseInt(p.position_x);
@@ -196,7 +196,10 @@ function initializeViewer() {
     ],
     loadingImg: null,
     touchmoveTwoFingers: true,
-    mousewheelCtrlKey: false
+    mousewheelCtrlKey: false,
+    defaultZoomLvl: 0, // Lowest zoom by default (most zoomed out)
+    minFov: 30,
+    maxFov: 90
   });
 }
 
@@ -249,7 +252,8 @@ function loadPanorama(index) {
   // Update viewer with new panorama
   viewer.setPanorama(panorama.file_path, {
     transition: 1000,
-    showLoader: true
+    showLoader: true,
+    zoom: 0 // Reset to lowest zoom level
   }).then(() => {
     // Clear existing markers
     const markersPlugin = viewer.getPlugin(MarkersPlugin);
@@ -321,7 +325,7 @@ function addNavigationMarkers(panorama, markersPlugin) {
   });
 
   // Handle marker clicks
-  markersPlugin.addEventListener('select-marker', (e, marker) => {
+  markersPlugin.addEventListener('select-marker', (_event, marker) => {
     if (marker.data && marker.data.targetIndex !== undefined) {
       loadPanorama(marker.data.targetIndex);
     }
@@ -376,7 +380,7 @@ function drawFloorPlan(level) {
   // Draw panorama markers for this level
   const panoramasOnLevel = validPanoramas.filter(p => p.level === level);
 
-  panoramasOnLevel.forEach((panorama, idx) => {
+  panoramasOnLevel.forEach((panorama) => {
     const x = parseInt(panorama.position_x);
     const y = parseInt(panorama.position_y);
     const isCurrentPanorama = validPanoramas[currentPanoramaIndex] === panorama;

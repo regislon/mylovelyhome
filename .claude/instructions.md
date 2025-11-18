@@ -74,9 +74,11 @@ Only panoramas whose `file_path`, `position_x`, `position_y`, and `level` column
 * Images named `level0.png`, `level1.png`, `level2.png`, `level3.png`, `level4.png`, etc. represent different floors.
 * The left panel must display the floor plan corresponding to the current panorama’s level.
 * Panorama positions must be plotted on the floor plan. use /equirectangular/icons/Walking_person_top_view.svg to represent each panorama.
+* the initial orientation of the icon must reflect the `orientation` field from the CSV.
 * use the rotation from the `orientation` field to rotate the icon representing the current panorama on the floor plan.
 * when the user rotates the panorama, the icon representing the current panorama on the floor plan must rotate accordingly to reflect the current orientation.
 * When the user clicks a panorama marker on the floor plan, the corresponding panorama must be loaded.
+* when the user unselect one Walking_person_top_view.svg, I want it keep the orientation it had before being unselected.
 
 
 ### **Right Panel: 360° Viewer with Navigation Hotspots**
@@ -86,7 +88,7 @@ Only panoramas whose `file_path`, `position_x`, `position_y`, and `level` column
 * Clicking a hotspot loads the linked panorama.
 * Transitions should be smooth (fade or default Photo Sphere Viewer behavior).
 * A dropdown menu must also be available to jump directly to any panorama.
-* The zoom must be the lower by default.
+* The zoom must be the lower by default when loading a panorama.
 
 
 

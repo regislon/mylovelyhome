@@ -1,4 +1,4 @@
-file_path,position_x,position_y,oriantation,level,name_fr,name_en
+file_path,position_x,position_y,orientation,level,name_fr,name_en
 ./assets/attique.jpg,141,184,100,level2,Attique,Attic
 ./assets/chambre_nord_est.jpg,,,,,Chambre nord-est,North-east bedroom
 ./assets/chambre_nord_ouest.jpg,,,,,Chambre nord-ouest,North-west bedroom
@@ -14,5 +14,5 @@ file_path,position_x,position_y,oriantation,level,name_fr,name_en
 ./assets/salle_de_bain_ouest.jpg,,,,,Salle de bain ouest,West bathroom
 ./assets/terrasse_1er_est.jpg,,,,,Terrasse 1er – est,First floor terrace – east
 ./assets/terrasse_1er_ouest.jpg,,,,,Terrasse 1er – ouest,First floor terrace – west
-./assets/terrasse_attique_est.jpg,292,495,90,level2,Terrasse attique – est,Attic terrace – east
-./assets/terrasse_attique_ouest.jpg,47,505,90,level2,Terrasse attique – ouest,Attic terrace – west
+./assets/terrasse_attique_est.jpg,292,495,90,level2,Terrasse attique� est,Attic terrace – east
+./assets/terrasse_attique_ouest.jpg,47,505,0,level2,Terrasse attique� ouest,Attic terrace – west
