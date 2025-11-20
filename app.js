@@ -25,10 +25,8 @@ let config = {};
 const viewerContainer = document.getElementById('viewer-container');
 const loadingElement = document.getElementById('loading');
 const errorElement = document.getElementById('error');
-const panoramaSelect = document.getElementById('panorama-select');
-const levelSelect = document.getElementById('level-select');
+const levelButtons = document.getElementById('level-buttons');
 const levelLabel = document.getElementById('level-label');
-const panoramaLabel = document.getElementById('panorama-label');
 const floorPlanCanvas = document.getElementById('floor-plan-canvas');
 const floorPlanTitle = document.getElementById('floor-plan-title');
 const ctx = floorPlanCanvas.getContext('2d');
@@ -106,12 +104,10 @@ async function loadTranslations() {
 function updateUIText() {
   // Update labels
   levelLabel.textContent = t('floor') + ':';
-  panoramaLabel.textContent = t('jumpTo');
   loadingElement.textContent = t('loading');
 
-  // Update dropdowns
-  populateLevelSelect();
-  populatePanoramaSelect();
+  // Update controls
+  populateLevelButtons();
 
   // Update floor plan title if a level is loaded
   if (currentFloorPlanLevel) {
@@ -165,12 +161,10 @@ async function init() {
     await loadWalkingPersonIconAsync();
 
     // Populate controls
-    populateLevelSelect();
-    populatePanoramaSelect();
+    populateLevelButtons();
 
     // Setup event listeners
-    setupLevelSelectListener();
-    setupPanoramaSelectListener();
+    setupLevelButtonsListener();
     setupFloorPlanClickListener();
 
     // Initialize UI text
@@ -228,24 +222,32 @@ function loadAreas() {
   });
 }
 
-// Populate level dropdown
-function populateLevelSelect() {
+// Populate level buttons
+function populateLevelButtons() {
   // Get unique levels from valid panoramas
   const levels = [...new Set(validPanoramas.map(p => p.level))].sort();
 
   // Clear and repopulate
-  levelSelect.innerHTML = `<option value="">${t('allLevels')}</option>`;
+  levelButtons.innerHTML = '';
 
   levels.forEach(level => {
-    const option = document.createElement('option');
-    option.value = level;
+    const button = document.createElement('button');
+    button.className = 'level-button';
+    button.dataset.level = level;
+
     // Try to translate the level name (e.g., "Level0", "Level1", "Level2")
     const levelKey = level.charAt(0).toUpperCase() + level.slice(1);
     const translatedLevel = translations[currentLanguage] && translations[currentLanguage][levelKey]
                             ? t(levelKey)
                             : levelKey;
-    option.textContent = translatedLevel;
-    levelSelect.appendChild(option);
+    button.textContent = translatedLevel;
+
+    // Mark as active if it's the current level
+    if (level === currentLevel || (currentLevel === null && validPanoramas[currentPanoramaIndex]?.level === level)) {
+      button.classList.add('active');
+    }
+
+    levelButtons.appendChild(button);
   });
 }
 
@@ -264,21 +266,25 @@ function populatePanoramaSelect() {
   });
 }
 
-// Setup level select listener
-function setupLevelSelectListener() {
-  levelSelect.addEventListener('change', (event) => {
-    const selectedLevel = event.target.value;
-    currentLevel = selectedLevel || null;
+// Setup level buttons listener
+function setupLevelButtonsListener() {
+  levelButtons.addEventListener('click', (event) => {
+    const button = event.target.closest('.level-button');
+    if (!button) return;
 
-    // Load floor plan for selected level
-    if (currentLevel) {
-      loadFloorPlan(currentLevel);
-    } else {
-      // Show floor plan for current panorama's level
-      if (validPanoramas[currentPanoramaIndex]) {
-        loadFloorPlan(validPanoramas[currentPanoramaIndex].level);
-      }
-    }
+    const selectedLevel = button.dataset.level;
+
+    // Remove active class from all buttons
+    levelButtons.querySelectorAll('.level-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // Add active class to clicked button
+    button.classList.add('active');
+
+    // Set current level and load floor plan
+    currentLevel = selectedLevel;
+    loadFloorPlan(currentLevel);
   });
 }
 
@@ -520,9 +526,6 @@ function loadPanorama(index) {
 
   currentPanoramaIndex = index;
   const panorama = validPanoramas[index];
-
-  // Update dropdown to reflect current panorama
-  panoramaSelect.value = index;
 
   // Load floor plan for panorama's level
   loadFloorPlan(panorama.level);

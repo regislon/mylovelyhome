@@ -168,6 +168,7 @@ Translation strings support placeholders using `{variable}` syntax:
 ### **Top Menu**
 
 * A top menu must include one button for each floor level found in the CSV. only one floor can be selected at a time.
+* No other button should be present
 
 
 ### **Left Panel: Floor Plan with Panorama Positions**
@@ -182,7 +183,7 @@ Translation strings support placeholders using `{variable}` syntax:
 a on the floor plan must rotate accordingly to reflect the current orientation.
 * When the user clicks a panorama marker on the floor plan, the corresponding panorama must be loaded.
 * when the user unselect one Walking_person_top_view.svg, I want it keep the orientation it had before being unselected.
-* display the area polygons from `areas.csv` on the floor plan. with transparent fill and colored border and put them bellow the svg icons.
+* display the area polygons from `areas.csv` on the floor plan. the polygons must be fully transparent when not selected, and must have a semi-transparent fill color when selected.
 * when the use click on an area polygon, load and display the corresponding markdown description in the right panel, instead of the panorama.
 * when the use click on the  Walking_person_top_view.svg that is on top of an area polygon, load the panorama as usual (do not load the area description). 
 
