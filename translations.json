@@ -1,0 +1,60 @@
+{
+  "en": {
+    "floor": "Floor",
+    "Level2": "Level 2",
+    "Level1": "Level 1",
+    "Level0": "Level 0",
+    "allLevels": "All Levels",
+    "jumpTo": "Jump to:",
+    "selectLocation": "Select a location...",
+    "floorPlan": "Floor Plan",
+    "floorPlanTitle": "Floor Plan - {level}",
+    "floorPlanNotAvailable": "Floor plan not available",
+    "loading": "Loading panoramas...",
+    "noValidPanoramas": "No valid panoramas found. Ensure panoramas have file_path, position_x, position_y, and level fields filled.",
+    "failedToInitialize": "Failed to initialize: {error}",
+    "failedToLoadPanorama": "Failed to load panorama: {path}",
+    "navigation": {
+      "north": "North ↑",
+      "east": "East →",
+      "south": "South ↓",
+      "west": "West ←",
+      "goTo": "Go {direction}"
+    },
+    "area": {
+      "information": "Area Information",
+      "noDescription": "No description available.",
+      "descriptionNotFound": "Description file not found: {file}",
+      "errorLoading": "Error loading description."
+    }
+  },
+  "fr": {
+    "floor": "Étage",
+    "Level2": "Attique",
+    "Level1": "1er étage",
+    "Level0": "Entrée",
+    "allLevels": "Tous les étages",
+    "jumpTo": "Aller à :",
+    "selectLocation": "Sélectionnez un lieu...",
+    "floorPlan": "Plan d'étage",
+    "floorPlanTitle": "Plan d'étage - {level}",
+    "floorPlanNotAvailable": "Plan d'étage non disponible",
+    "loading": "Chargement des panoramas...",
+    "noValidPanoramas": "Aucun panorama valide trouvé. Assurez-vous que les panoramas ont les champs file_path, position_x, position_y et level remplis.",
+    "failedToInitialize": "Échec de l'initialisation : {error}",
+    "failedToLoadPanorama": "Échec du chargement du panorama : {path}",
+    "navigation": {
+      "north": "Nord ↑",
+      "east": "Est →",
+      "south": "Sud ↓",
+      "west": "Ouest ←",
+      "goTo": "Aller au {direction}"
+    },
+    "area": {
+      "information": "Informations sur la zone",
+      "noDescription": "Aucune description disponible.",
+      "descriptionNotFound": "Fichier de description non trouvé : {file}",
+      "errorLoading": "Erreur lors du chargement de la description."
+    }
+  }
+}

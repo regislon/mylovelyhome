@@ -16,11 +16,11 @@
     <!-- Top Menu -->
     <div id="top-menu">
       <div id="controls">
-        <label for="level-select">Floor:</label>
+        <label for="level-select" id="level-label">Floor:</label>
         <select id="level-select">
           <option value="">All Levels</option>
         </select>
-        <label for="panorama-select">Jump to:</label>
+        <label for="panorama-select" id="panorama-label">Jump to:</label>
         <select id="panorama-select">
           <option value="">Select a location...</option>
         </select>
@@ -31,7 +31,7 @@
     <div id="main-content">
       <!-- Left Panel: Floor Plan -->
       <div id="floor-plan-panel">
-        <h3 id="floor-plan-title">Floor Plan</h3>
+        <h3 id="floor-plan-title"></h3>
         <div id="floor-plan-container">
           <canvas id="floor-plan-canvas"></canvas>
         </div>
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Loading and Error States -->
-    <div id="loading">Loading panoramas...</div>
+    <div id="loading"></div>
     <div id="error" style="display: none;"></div>
   </div>
 

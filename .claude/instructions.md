@@ -92,10 +92,12 @@ The application may optionally load a second file named **`areas.csv`** located 
 
 * Images named `level0.png`, `level1.png`, `level2.png`, `level3.png`, `level4.png`, etc. represent different floors.
 * The left panel must display the floor plan corresponding to the current panorama’s level.
+* the plan should be display at a height that avoid scrollbars, but as large ad the page allow it.
 * Panorama positions must be plotted on the floor plan. use /equirectangular/icons/Walking_person_top_view.svg to represent each panorama.
 * the initial orientation of the icon must reflect the `orientation` field from the CSV.
 * use the rotation from the `orientation` field to rotate the icon representing the current panorama on the floor plan.
-* when the user rotates the panorama, the icon representing the current panorama on the floor plan must rotate accordingly to reflect the current orientation.
+* when the user rotates the panorama, the icon representing the current panoram1
+a on the floor plan must rotate accordingly to reflect the current orientation.
 * When the user clicks a panorama marker on the floor plan, the corresponding panorama must be loaded.
 * when the user unselect one Walking_person_top_view.svg, I want it keep the orientation it had before being unselected.
 * display the area polygons from `areas.csv` on the floor plan. with transparent fill and colored border and put them bellow the svg icons.
@@ -110,7 +112,7 @@ The application may optionally load a second file named **`areas.csv`** located 
 * Transitions should be smooth (fade or default Photo Sphere Viewer behavior).
 * A dropdown menu must also be available to jump directly to any panorama.
 * The zoom must be the lower by default when loading a panorama.
-* limit 
+* limit the pitch to avoid bottom poles of the equirectangular images.
 
 
 

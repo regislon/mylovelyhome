@@ -105,7 +105,7 @@ body {
 
 #floor-plan-container {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   padding: 20px;
   display: flex;
   justify-content: center;
@@ -114,7 +114,10 @@ body {
 
 #floor-plan-canvas {
   max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
+  object-fit: contain;
   border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: crosshair;
   image-rendering: crisp-edges;

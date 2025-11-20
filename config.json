@@ -1,0 +1,10 @@
+{
+  "language": "fr",
+  "defaultZoomLevel": 0,
+  "pitchLimitDegrees": 60,
+  "transitionDuration": 1000,
+  "floorPlanIconSize": {
+    "current": 30,
+    "other": 24
+  }
+}

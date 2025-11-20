@@ -14,20 +14,132 @@ let currentFloorPlanLevel = null;
 let allAreas = []; // All areas from areas.csv
 let currentViewMode = 'panorama'; // 'panorama' or 'area'
 
+// Translation state
+let translations = {};
+let currentLanguage = 'fr'; // Default language, will be overridden by config
+
+// Application config
+let config = {};
+
 // DOM elements
 const viewerContainer = document.getElementById('viewer-container');
 const loadingElement = document.getElementById('loading');
 const errorElement = document.getElementById('error');
 const panoramaSelect = document.getElementById('panorama-select');
 const levelSelect = document.getElementById('level-select');
+const levelLabel = document.getElementById('level-label');
+const panoramaLabel = document.getElementById('panorama-label');
 const floorPlanCanvas = document.getElementById('floor-plan-canvas');
 const floorPlanTitle = document.getElementById('floor-plan-title');
 const ctx = floorPlanCanvas.getContext('2d');
+
+// Translation function with placeholder support
+function t(key, placeholders = {}) {
+  const keys = key.split('.');
+  let value = translations[currentLanguage];
+
+  for (const k of keys) {
+    if (value && typeof value === 'object') {
+      value = value[k];
+    } else {
+      console.warn(`Translation key not found: ${key}`);
+      return key;
+    }
+  }
+
+  if (typeof value !== 'string') {
+    console.warn(`Translation value is not a string: ${key}`);
+    return key;
+  }
+
+  // Replace placeholders
+  return value.replace(/\{(\w+)\}/g, (match, placeholder) => {
+    return placeholders[placeholder] !== undefined ? placeholders[placeholder] : match;
+  });
+}
+
+// Load configuration from JSON file
+async function loadConfig() {
+  try {
+    const response = await fetch('config.json');
+    if (!response.ok) {
+      throw new Error('Failed to load config');
+    }
+    config = await response.json();
+    console.log('Configuration loaded:', config);
+
+    // Apply config settings
+    if (config.language) {
+      currentLanguage = config.language;
+      console.log('Language set from config:', currentLanguage);
+    }
+  } catch (error) {
+    console.error('Error loading config:', error);
+    // Fallback: use defaults
+    config = {
+      language: 'fr',
+      defaultZoomLevel: 0,
+      pitchLimitDegrees: 60,
+      transitionDuration: 1000
+    };
+    currentLanguage = config.language;
+  }
+}
+
+// Load translations from JSON file
+async function loadTranslations() {
+  try {
+    const response = await fetch('translations.json');
+    if (!response.ok) {
+      throw new Error('Failed to load translations');
+    }
+    translations = await response.json();
+    console.log('Translations loaded for languages:', Object.keys(translations));
+  } catch (error) {
+    console.error('Error loading translations:', error);
+    // Fallback: use empty translations
+    translations = { en: {}, fr: {} };
+  }
+}
+
+// Update all UI text based on current language
+function updateUIText() {
+  // Update labels
+  levelLabel.textContent = t('floor') + ':';
+  panoramaLabel.textContent = t('jumpTo');
+  loadingElement.textContent = t('loading');
+
+  // Update dropdowns
+  populateLevelSelect();
+  populatePanoramaSelect();
+
+  // Update floor plan title if a level is loaded
+  if (currentFloorPlanLevel) {
+    const levelKey = currentFloorPlanLevel.charAt(0).toUpperCase() + currentFloorPlanLevel.slice(1);
+    const levelName = translations[currentLanguage] && translations[currentLanguage][levelKey]
+                      ? t(levelKey)
+                      : levelKey;
+    floorPlanTitle.textContent = t('floorPlanTitle', { level: levelName });
+  } else {
+    floorPlanTitle.textContent = t('floorPlan');
+  }
+
+  // Redraw floor plan to update any text
+  if (currentFloorPlanLevel && floorPlanImage) {
+    drawFloorPlan(currentFloorPlanLevel);
+  }
+}
 
 // Initialize the application
 async function init() {
   try {
     showLoading(true);
+
+    // Load config first to get language setting
+    await loadConfig();
+
+    // Load translations
+    await loadTranslations();
 
     // Load and parse CSV files
     allPanoramas = await loadPanoramas();
@@ -42,7 +154,7 @@ async function init() {
     });
 
     if (validPanoramas.length === 0) {
-      showError('No valid panoramas found. Ensure panoramas have file_path, position_x, position_y, and level fields filled.');
+      showError(t('noValidPanoramas'));
       return;
     }
 
@@ -61,13 +173,16 @@ async function init() {
     setupPanoramaSelectListener();
     setupFloorPlanClickListener();
 
+    // Initialize UI text
+    updateUIText();
+
     // Load first panorama
     loadPanorama(0);
 
     showLoading(false);
   } catch (error) {
     console.error('Initialization error:', error);
-    showError(`Failed to initialize: ${error.message}`);
+    showError(t('failedToInitialize', { error: error.message }));
   }
 }
 
@@ -119,24 +234,31 @@ function populateLevelSelect() {
   const levels = [...new Set(validPanoramas.map(p => p.level))].sort();
 
   // Clear and repopulate
-  levelSelect.innerHTML = '<option value="">All Levels</option>';
+  levelSelect.innerHTML = `<option value="">${t('allLevels')}</option>`;
 
   levels.forEach(level => {
     const option = document.createElement('option');
     option.value = level;
-    option.textContent = level.charAt(0).toUpperCase() + level.slice(1);
+    // Try to translate the level name (e.g., "Level0", "Level1", "Level2")
+    const levelKey = level.charAt(0).toUpperCase() + level.slice(1);
+    const translatedLevel = translations[currentLanguage] && translations[currentLanguage][levelKey]
+                            ? t(levelKey)
+                            : levelKey;
+    option.textContent = translatedLevel;
     levelSelect.appendChild(option);
   });
 }
 
 // Populate panorama dropdown
 function populatePanoramaSelect() {
-  panoramaSelect.innerHTML = '<option value="">Select a location...</option>';
+  panoramaSelect.innerHTML = `<option value="">${t('selectLocation')}</option>`;
 
   validPanoramas.forEach((panorama, index) => {
     const option = document.createElement('option');
     option.value = index;
-    const displayName = panorama.name_en || panorama.name_fr || panorama.file_path;
+    // Use language-specific name based on current language
+    const displayName = (currentLanguage === 'fr' ? panorama.name_fr : panorama.name_en)
+                        || panorama.name_en || panorama.name_fr || panorama.file_path;
     option.textContent = displayName;
     panoramaSelect.appendChild(option);
   });
@@ -264,9 +386,16 @@ function initializeViewer() {
     loadingImg: null,
     touchmoveTwoFingers: true,
     mousewheelCtrlKey: false,
-    defaultZoomLvl: 0, // Lowest zoom by default (most zoomed out)
+    defaultZoomLvl: 0,
     minFov: 30,
-    maxFov: 90
+    maxFov: 90,
+    defaultLat: 0,
+    latRange: [-Math.PI / 3, Math.PI / 3] // Limit pitch to ±60°
+  });
+
+  console.log('Viewer initialized with latitude range (pitch limits):', {
+    range: [-Math.PI / 3, Math.PI / 3],
+    rangeInDegrees: [(-Math.PI / 3 * 180 / Math.PI).toFixed(1) + '°', (Math.PI / 3 * 180 / Math.PI).toFixed(1) + '°']
   });
 }
 
@@ -324,23 +453,27 @@ async function loadAreaDescription(area) {
         const markdown = await response.text();
         // Simple markdown rendering (convert to HTML)
         const html = convertMarkdownToHTML(markdown);
+        const areaName = (currentLanguage === 'fr' ? area.name_fr : area.name_en)
+                        || area.name_en || area.name_fr || t('area.information');
         markdownContainer.innerHTML = `
           <div style="max-width: 800px; margin: 0 auto;">
-            <h1>${area.name_en || area.name_fr || 'Area Information'}</h1>
+            <h1>${areaName}</h1>
             ${html}
           </div>
         `;
       } else {
-        markdownContainer.innerHTML = `<p>Description file not found: ${area.description_file}</p>`;
+        markdownContainer.innerHTML = `<p>${t('area.descriptionNotFound', { file: area.description_file })}</p>`;
       }
     } catch (error) {
       console.error('Failed to load markdown:', error);
-      markdownContainer.innerHTML = `<p>Error loading description.</p>`;
+      markdownContainer.innerHTML = `<p>${t('area.errorLoading')}</p>`;
     }
   } else {
+    const areaName = (currentLanguage === 'fr' ? area.name_fr : area.name_en)
+                    || area.name_en || area.name_fr || t('area.information');
     markdownContainer.innerHTML = `
-      <h1>${area.name_en || area.name_fr || 'Area'}</h1>
-      <p>No description available.</p>
+      <h1>${areaName}</h1>
+      <p>${t('area.noDescription')}</p>
     `;
   }
 }
@@ -413,7 +546,7 @@ function loadPanorama(index) {
     setupRotationListener();
   }).catch((error) => {
     console.error('Failed to load panorama:', error);
-    showError(`Failed to load panorama: ${panorama.file_path}`);
+    showError(t('failedToLoadPanorama', { path: panorama.file_path }));
   });
 }
 
@@ -439,10 +572,10 @@ function setupRotationListener() {
 // Add navigation markers based on available links
 function addNavigationMarkers(panorama, markersPlugin) {
   const directions = [
-    { key: 'north', position: { yaw: 0, pitch: 0 }, label: 'North ↑' },
-    { key: 'east', position: { yaw: Math.PI / 2, pitch: 0 }, label: 'East →' },
-    { key: 'south', position: { yaw: Math.PI, pitch: 0 }, label: 'South ↓' },
-    { key: 'west', position: { yaw: -Math.PI / 2, pitch: 0 }, label: 'West ←' }
+    { key: 'north', position: { yaw: 0, pitch: 0 }, label: t('navigation.north') },
+    { key: 'east', position: { yaw: Math.PI / 2, pitch: 0 }, label: t('navigation.east') },
+    { key: 'south', position: { yaw: Math.PI, pitch: 0 }, label: t('navigation.south') },
+    { key: 'west', position: { yaw: -Math.PI / 2, pitch: 0 }, label: t('navigation.west') }
   ];
 
   directions.forEach((direction) => {
@@ -460,7 +593,7 @@ function addNavigationMarkers(panorama, markersPlugin) {
           size: { width: 80, height: 40 },
           anchor: 'center center',
           tooltip: {
-            content: `Go ${direction.key}`,
+            content: t('navigation.goTo', { direction: direction.key }),
             position: 'bottom center'
           },
           data: {
@@ -490,7 +623,12 @@ function loadFloorPlan(level) {
   currentFloorPlanLevel = level;
   const floorPlanPath = `assets/${level}.png`;
 
-  floorPlanTitle.textContent = `Floor Plan - ${level.charAt(0).toUpperCase() + level.slice(1)}`;
+  // Translate level name
+  const levelKey = level.charAt(0).toUpperCase() + level.slice(1);
+  const levelName = translations[currentLanguage] && translations[currentLanguage][levelKey]
+                    ? t(levelKey)
+                    : levelKey;
+  floorPlanTitle.textContent = t('floorPlanTitle', { level: levelName });
 
   const img = new Image();
   img.onload = () => {
@@ -508,7 +646,7 @@ function loadFloorPlan(level) {
     ctx.fillStyle = '#fff';
     ctx.font = '16px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Floor plan not available', floorPlanCanvas.width / 2, floorPlanCanvas.height / 2);
+    ctx.fillText(t('floorPlanNotAvailable'), floorPlanCanvas.width / 2, floorPlanCanvas.height / 2);
   };
 
   img.src = floorPlanPath;
@@ -656,7 +794,8 @@ function drawFloorPlan(level) {
 
     // Draw label (optional - only for current panorama)
     if (isCurrentPanorama) {
-      const label = panorama.name_en || panorama.name_fr || '';
+      const label = (currentLanguage === 'fr' ? panorama.name_fr : panorama.name_en)
+                    || panorama.name_en || panorama.name_fr || '';
       if (label) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(x + 15, y - 10, ctx.measureText(label).width + 10, 20);
