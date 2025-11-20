@@ -12,7 +12,7 @@ file_path,position_x,position_y,orientation,level,name_fr,name_en
 ./assets/reduit_attique.jpg,,,,,Rduit attique,Attic storage
 ./assets/salle_de_bain_est.jpg,,,,,Salle de bain est,East bathroom
 ./assets/salle_de_bain_ouest.jpg,,,,,Salle de bain ouest,West bathroom
-./assets/terrasse_1er_est.jpg,292,495,90,level1,"Terrasse 1er est",First floor terrace â east
+./assets/terrasse_1er_est.jpg,292,495,90,level1,Terrasse 1er est,First floor terrace â east
 ./assets/terrasse_1er_ouest.jpg,47,505,90,level1,Terrasse 1er ouest,First floor terrace â west
 ./assets/terrasse_attique_est.jpg,292,495,90,level2,Terrasse attique est,Attic terrace â east
 ./assets/terrasse_attique_ouest.jpg,47,505,0,level2,Terrasse attique ouest,Attic terrace âwest

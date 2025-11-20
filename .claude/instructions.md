@@ -183,7 +183,8 @@ Translation strings support placeholders using `{variable}` syntax:
 a on the floor plan must rotate accordingly to reflect the current orientation.
 * When the user clicks a panorama marker on the floor plan, the corresponding panorama must be loaded.
 * when the user unselect one Walking_person_top_view.svg, I want it keep the orientation it had before being unselected.
-* display the area polygons from `areas.csv` on the floor plan. the polygons must be fully transparent when not selected, and must have a semi-transparent fill color when selected.
+* display the area polygons from `areas.csv` on the floor plan. the polygons must be fully transparent with no border when not selected, and must have a semi-transparent fill color when selected. 
+* when an area is selected, unselected any Walking_person_top_view.svg that could be selected.
 * when the use click on an area polygon, load and display the corresponding markdown description in the right panel, instead of the panorama.
 * when the use click on the  Walking_person_top_view.svg that is on top of an area polygon, load the panorama as usual (do not load the area description). 
 
@@ -196,6 +197,12 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 * A dropdown menu must also be available to jump directly to any panorama.
 * The zoom must be the lower by default when loading a panorama.
 * limit the pitch to avoid bottom poles of the equirectangular images.
+
+markdown description: 
+* the markdown description should not include a text, just the content of the markdown file is taken. 
+* align the content to the left
+* the image should be displayed
+* Make a nice layout for the text and images. 
 
 
 

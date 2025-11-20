@@ -13,6 +13,7 @@ let walkingPersonIcon = null;
 let currentFloorPlanLevel = null;
 let allAreas = []; // All areas from areas.csv
 let currentViewMode = 'panorama'; // 'panorama' or 'area'
+let selectedAreaId = null; // Currently selected area ID
 
 // Translation state
 let translations = {};
@@ -282,6 +283,9 @@ function setupLevelButtonsListener() {
     // Add active class to clicked button
     button.classList.add('active');
 
+    // Deselect any area when switching levels
+    selectedAreaId = null;
+
     // Set current level and load floor plan
     currentLevel = selectedLevel;
     loadFloorPlan(currentLevel);
@@ -352,6 +356,8 @@ function setupFloorPlanClickListener() {
 
     if (clicked) {
       const index = validPanoramas.indexOf(clicked);
+      // Deselect any area when loading a panorama
+      selectedAreaId = null;
       loadPanorama(index);
       return;
     }
@@ -365,7 +371,24 @@ function setupFloorPlanClickListener() {
     });
 
     if (clickedArea) {
+      // Toggle selection: if clicking the same area, deselect it; otherwise select the new one
+      if (selectedAreaId === clickedArea.area_id) {
+        selectedAreaId = null;
+      } else {
+        selectedAreaId = clickedArea.area_id;
+      }
+
+      // Redraw floor plan to show selection change
+      drawFloorPlan(level);
+
+      // Load area description
       loadAreaDescription(clickedArea);
+    } else {
+      // Clicked on empty space - deselect area if one was selected
+      if (selectedAreaId !== null) {
+        selectedAreaId = null;
+        drawFloorPlan(level);
+      }
     }
   });
 }
@@ -446,7 +469,18 @@ async function loadAreaDescription(area) {
   if (!markdownContainer) {
     markdownContainer = document.createElement('div');
     markdownContainer.id = 'markdown-container';
-    markdownContainer.style.cssText = 'width: 100%; height: 100%; padding: 20px; overflow-y: auto; background: white; box-sizing: border-box;';
+    markdownContainer.style.cssText = `
+      width: 100%;
+      height: 100%;
+      padding: 30px 40px;
+      overflow-y: auto;
+      background: #ffffff;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    `;
     viewerContainer.parentElement.appendChild(markdownContainer);
   }
   markdownContainer.style.display = 'block';
@@ -457,13 +491,12 @@ async function loadAreaDescription(area) {
       const response = await fetch(area.description_file);
       if (response.ok) {
         const markdown = await response.text();
-        // Simple markdown rendering (convert to HTML)
-        const html = convertMarkdownToHTML(markdown);
-        const areaName = (currentLanguage === 'fr' ? area.name_fr : area.name_en)
-                        || area.name_en || area.name_fr || t('area.information');
+        // Get the directory path of the markdown file for relative image paths
+        const markdownDir = area.description_file.substring(0, area.description_file.lastIndexOf('/') + 1);
+        // Enhanced markdown rendering with styling and path adjustment
+        const html = convertMarkdownToHTML(markdown, markdownDir);
         markdownContainer.innerHTML = `
-          <div style="max-width: 800px; margin: 0 auto;">
-            <h1>${areaName}</h1>
+          <div class="markdown-content">
             ${html}
           </div>
         `;
@@ -475,28 +508,48 @@ async function loadAreaDescription(area) {
       markdownContainer.innerHTML = `<p>${t('area.errorLoading')}</p>`;
     }
   } else {
-    const areaName = (currentLanguage === 'fr' ? area.name_fr : area.name_en)
-                    || area.name_en || area.name_fr || t('area.information');
     markdownContainer.innerHTML = `
-      <h1>${areaName}</h1>
-      <p>${t('area.noDescription')}</p>
+      <div style="max-width: 100%; text-align: left;">
+        <p>${t('area.noDescription')}</p>
+      </div>
     `;
   }
 }
 
-// Simple markdown to HTML converter
-function convertMarkdownToHTML(markdown) {
+// Enhanced markdown to HTML converter with image and link support
+function convertMarkdownToHTML(markdown, basePath = '') {
   return markdown
+    // Images: ![alt](url) - adjust relative paths
+    .replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+      // If URL doesn't start with http://, https://, or /, treat as relative
+      if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+        url = basePath + url;
+      }
+      return `<img src="${url}" alt="${alt}" class="markdown-image">`;
+    })
+    // Links: [text](url)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Headings
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\*(.*)\*/gim, '<em>$1</em>')
+    // Bold and italic
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    // Unordered lists
+    .replace(/^\* (.+)$/gim, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+    // Paragraphs
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>')
     .replace(/^(.+)$/gim, '<p>$1</p>')
+    // Clean up
     .replace(/<p><h/g, '<h')
-    .replace(/<\/h(\d)><\/p>/g, '</h$1>');
+    .replace(/<\/h(\d)><\/p>/g, '</h$1>')
+    .replace(/<p><img/g, '<img')
+    .replace(/<\/p><\/p>/g, '</p>')
+    .replace(/<p><ul>/g, '<ul>')
+    .replace(/<\/ul><\/p>/g, '</ul>');
 }
 
 // Close markdown view and return to panorama
@@ -712,16 +765,23 @@ function drawAreaPolygons(areas) {
     }
     ctx.closePath();
 
-    // Fill with transparent color
-    const fillColor = area.fill_color || 'rgba(100, 150, 200, 0.2)';
-    ctx.fillStyle = fillColor;
-    ctx.fill();
+    // Check if this area is selected
+    const isSelected = selectedAreaId === area.area_id;
 
-    // Border with color
-    const borderColor = area.border_color || area.color || '#4299e1';
-    ctx.strokeStyle = borderColor;
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    // Only draw if selected
+    if (isSelected) {
+      // Fill with semi-transparent color
+      const fillColor = area.fill_color || 'rgba(100, 150, 200, 0.3)';
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+
+      // Border
+      const borderColor = area.border_color || area.color || '#4299e1';
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+    // When not selected: no fill, no border (fully transparent)
   });
 }
 
@@ -746,7 +806,8 @@ function drawFloorPlan(level) {
   panoramasOnLevel.forEach((panorama) => {
     const x = parseInt(panorama.position_x);
     const y = parseInt(panorama.position_y);
-    const isCurrentPanorama = validPanoramas[currentPanoramaIndex] === panorama;
+    // Don't highlight any panorama as current if an area is selected
+    const isCurrentPanorama = selectedAreaId === null && validPanoramas[currentPanoramaIndex] === panorama;
 
     // Draw marker using walking person icon or fallback to circle
     const useIcon = walkingPersonIcon && walkingPersonIcon.complete && walkingPersonIcon.naturalWidth > 0;
