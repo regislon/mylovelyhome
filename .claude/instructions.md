@@ -82,11 +82,93 @@ The application may optionally load a second file named **`areas.csv`** located 
 
 ---
 
-## **4. Navigation Behavior**
+## **4. Configuration and Internationalization**
+
+### **4.1 Application Configuration (`config.json`)**
+
+The application loads a configuration file **`config.json`** at startup to configure application settings.
+
+**Structure:**
+
+```json
+{
+  "language": "fr",
+  "defaultZoomLevel": 0,
+  "pitchLimitDegrees": 60,
+  "transitionDuration": 1000,
+  "floorPlanIconSize": {
+    "current": 30,
+    "other": 24
+  }
+}
+```
+
+**Configuration Parameters:**
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `language` | Application language code (`"fr"` or `"en"`) | `"fr"` |
+| `defaultZoomLevel` | Initial zoom level for panoramas | `0` |
+| `pitchLimitDegrees` | Maximum pitch angle (up/down) in degrees | `60` |
+| `transitionDuration` | Panorama transition duration in milliseconds | `1000` |
+| `floorPlanIconSize` | Icon sizes for floor plan markers | `{ current: 30, other: 24 }` |
+
+**Important:** The language setting is **not** exposed to the user via UI. It must be configured in `config.json` only.
+
+### **4.2 Translations (`translations.json`)**
+
+The application supports multiple languages through a **`translations.json`** file.
+
+**Structure:**
+
+```json
+{
+  "en": {
+    "floor": "Floor",
+    "Level0": "Entrance",
+    "Level1": "1st Floor",
+    "Level2": "Attic",
+    ...
+  },
+  "fr": {
+    "floor": "Étage",
+    "Level0": "Entrée",
+    "Level1": "1er étage",
+    "Level2": "Attique",
+    ...
+  }
+}
+```
+
+**Translation Keys:**
+
+* **UI Labels:** `floor`, `jumpTo`, `allLevels`, `selectLocation`
+* **Level Names:** `Level0`, `Level1`, `Level2`, etc. (customizable per project)
+* **Messages:** `loading`, `noValidPanoramas`, `failedToInitialize`, `failedToLoadPanorama`
+* **Floor Plan:** `floorPlan`, `floorPlanTitle`, `floorPlanNotAvailable`
+* **Navigation:** `navigation.north`, `navigation.east`, `navigation.south`, `navigation.west`, `navigation.goTo`
+* **Areas:** `area.information`, `area.noDescription`, `area.descriptionNotFound`, `area.errorLoading`
+
+**Placeholder Support:**
+
+Translation strings support placeholders using `{variable}` syntax:
+* `"floorPlanTitle": "Floor Plan - {level}"`
+* `"failedToInitialize": "Failed to initialize: {error}"`
+
+**Language-Aware Content:**
+
+* Panorama names use `name_fr` or `name_en` based on current language
+* Area names use `name_fr` or `name_en` based on current language
+* Level names in dropdowns are translated using the configured language
+
+---
+
+## **5. Navigation Behavior**
 
 ### **Top Menu**
 
-* A top menu must include a dropdown allowing the user to directly jump to any panorama or switch between floor levels.
+* A top menu must include one button for each floor level found in the CSV. only one floor can be selected at a time.
+
 
 ### **Left Panel: Floor Plan with Panorama Positions**
 
@@ -121,19 +203,24 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 
 
 
-## **6. Application Logic (Expected Behavior)**
+## **7. Application Logic (Expected Behavior)**
 
-### **6.1 Initialization**
+### **7.1 Initialization**
 
+* Load `config.json` to get application settings (especially language).
+* Load `translations.json` for internationalization.
 * Load `assets.csv` using fetch().
-* Parse the CSV to JSON.
+* Load `areas.csv` (optional).
+* Parse the CSVs to JSON.
 * Build an internal dictionary of panoramas keyed by ID or path.
-* Load the first panorama in the list.
+* Initialize UI text with translations.
+* Load the first valid panorama in the list.
 
-### **6.2 Panorama Rendering**
+### **7.2 Panorama Rendering**
 
 * Use **Photo Sphere Viewer** to create a viewer instance inside a container.
-* Load the current panorama’s `path` as the source.
+* Load the current panorama's `path` as the source.
+* Apply configuration settings (zoom level, pitch limits, transition duration).
 
 
 
@@ -141,7 +228,7 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 
 ---
 
-## **7. Deployment Requirements**
+## **8. Deployment Requirements**
 
 * The project must run from **static hosting** (GitHub Pages).
 * All scripts and assets must use **relative** paths.
@@ -149,7 +236,7 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 
 ---
 
-## **8. Constraints**
+## **9. Constraints**
 
 * No TypeScript unless compiled manually beforehand (not recommended).
 * No package managers, bundlers, or containerized runtimes.
@@ -157,17 +244,22 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 
 ---
 
-## **9. Deliverables Expected from the AI Tool**
+## **10. Deliverables Expected from the AI Tool**
 
 The AI tool must be able to generate:
 
 1. **A complete `index.html`** including CDN imports.
 2. **A complete `app.js`** handling:
 
-   * CSV loading
+   * Configuration loading (`config.json`)
+   * Translation loading (`translations.json`)
+   * CSV loading (`assets.csv`, `areas.csv`)
    * Image rendering
    * Hotspot navigation
-3. **A template `assets.csv`**
-4. **Basic CSS styling (`style.css`)**
-5. Optional: README explaining usage and setup.
+   * Internationalization
+3. **A `config.json`** configuration file
+4. **A `translations.json`** translations file with English and French support
+5. **Template CSV files** (`assets.csv`, `areas.csv`)
+6. **Basic CSS styling (`style.css`)**
+7. Optional: README explaining usage and setup.
 
