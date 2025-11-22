@@ -124,7 +124,7 @@ body {
   object-fit: contain;
   border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: crosshair;
-  image-rendering: crisp-edges;
+  image-rendering: auto;
 }
 
 /* Right Panel: Viewer */

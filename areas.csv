@@ -1,2 +1,3 @@
   area_id,level,name_en,name_fr,polygon_wkt,description_file
-  salon,level2,Living Room,Salon,"POLYGON((71 118, 72 441, 241 444, 244 124,  71 118))",./descriptions/salon.md
+  salon,level2,Living Room,Salon,"POLYGON ((89 161, 86 596, 342 592, 342 159, 89 161))",./descriptions/salon.md
+  réduit,level2,Living Room,Salon,"POLYGON ((89 158, 240 159, 236 112, 162 114, 160 51, 87 52, 89 158))",./descriptions/reduit.md

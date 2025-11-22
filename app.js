@@ -31,6 +31,7 @@ const levelLabel = document.getElementById('level-label');
 const floorPlanCanvas = document.getElementById('floor-plan-canvas');
 const floorPlanTitle = document.getElementById('floor-plan-title');
 const ctx = floorPlanCanvas.getContext('2d');
+let initialImageContainer = null;
 
 // Translation function with placeholder support
 function t(key, placeholders = {}) {
@@ -171,8 +172,14 @@ async function init() {
     // Initialize UI text
     updateUIText();
 
-    // Load first panorama
-    loadPanorama(0);
+    // Load default floor plan (first level)
+    if (validPanoramas.length > 0 && validPanoramas[0].level) {
+      currentLevel = validPanoramas[0].level;
+      loadFloorPlan(currentLevel);
+    }
+
+    // Show initial image instead of loading first panorama
+    showInitialImage();
 
     showLoading(false);
   } catch (error) {
@@ -212,8 +219,13 @@ function loadAreas() {
         if (results.errors.length > 0) {
           console.warn('Areas CSV parsing warnings:', results.errors);
         }
-        console.log(`Loaded ${results.data.length} areas`);
-        resolve(results.data);
+        // Add unique internal ID to each area (to handle duplicate area_ids)
+        const areasWithUniqueIds = results.data.map((area, index) => ({
+          ...area,
+          _uniqueId: `${area.area_id}_${index}`
+        }));
+        console.log(`Loaded ${areasWithUniqueIds.length} areas`);
+        resolve(areasWithUniqueIds);
       },
       error: (error) => {
         console.warn('areas.csv not found or failed to load');
@@ -335,8 +347,11 @@ function isPointInPolygon(x, y, polygonData) {
 function setupFloorPlanClickListener() {
   floorPlanCanvas.addEventListener('click', (event) => {
     const rect = floorPlanCanvas.getBoundingClientRect();
-    const scaleX = floorPlanCanvas.width / rect.width;
-    const scaleY = floorPlanCanvas.height / rect.height;
+    const dpr = window.devicePixelRatio || 1;
+
+    // Calculate scale accounting for device pixel ratio
+    const scaleX = (floorPlanCanvas.width / dpr) / rect.width;
+    const scaleY = (floorPlanCanvas.height / dpr) / rect.height;
     const x = (event.clientX - rect.left) * scaleX;
     const y = (event.clientY - rect.top) * scaleY;
 
@@ -372,10 +387,10 @@ function setupFloorPlanClickListener() {
 
     if (clickedArea) {
       // Toggle selection: if clicking the same area, deselect it; otherwise select the new one
-      if (selectedAreaId === clickedArea.area_id) {
+      if (selectedAreaId === clickedArea._uniqueId) {
         selectedAreaId = null;
       } else {
-        selectedAreaId = clickedArea.area_id;
+        selectedAreaId = clickedArea._uniqueId;
       }
 
       // Redraw floor plan to show selection change
@@ -461,7 +476,8 @@ async function loadAreaDescription(area) {
   console.log('Loading area description:', area);
   currentViewMode = 'area';
 
-  // Hide viewer, show markdown container
+  // Hide viewer and initial image, show markdown container
+  hideInitialImage();
   viewerContainer.style.display = 'none';
 
   // Create or get markdown container
@@ -562,6 +578,48 @@ window.closeMarkdownView = function() {
   viewerContainer.style.display = 'block';
 };
 
+// Show initial image on page load
+function showInitialImage() {
+  // Create initial image container if it doesn't exist
+  if (!initialImageContainer) {
+    initialImageContainer = document.createElement('div');
+    initialImageContainer.id = 'initial-image-container';
+    initialImageContainer.style.cssText = `
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #000;
+      overflow: hidden;
+    `;
+
+    const img = document.createElement('img');
+    img.src = './assets/ext.png';
+    img.style.cssText = `
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    `;
+
+    initialImageContainer.appendChild(img);
+    viewerContainer.parentElement.appendChild(initialImageContainer);
+  }
+
+  // Hide viewer, show initial image
+  viewerContainer.style.display = 'none';
+  initialImageContainer.style.display = 'flex';
+}
+
+// Hide initial image
+function hideInitialImage() {
+  if (initialImageContainer) {
+    initialImageContainer.style.display = 'none';
+  }
+}
+
 // Load a specific panorama by index
 function loadPanorama(index) {
   if (index < 0 || index >= validPanoramas.length) {
@@ -575,6 +633,7 @@ function loadPanorama(index) {
   if (markdownContainer) {
     markdownContainer.style.display = 'none';
   }
+  hideInitialImage();
   viewerContainer.style.display = 'block';
 
   currentPanoramaIndex = index;
@@ -677,7 +736,7 @@ function loadFloorPlan(level) {
   }
 
   currentFloorPlanLevel = level;
-  const floorPlanPath = `assets/${level}.png`;
+  const floorPlanPath = `assets/${level}.svg`;
 
   // Translate level name
   const levelKey = level.charAt(0).toUpperCase() + level.slice(1);
@@ -689,8 +748,18 @@ function loadFloorPlan(level) {
   const img = new Image();
   img.onload = () => {
     floorPlanImage = img;
-    floorPlanCanvas.width = img.width;
-    floorPlanCanvas.height = img.height;
+
+    // Get device pixel ratio for high-DPI displays (Retina, etc.)
+    const dpr = window.devicePixelRatio || 1;
+
+    // Set canvas size accounting for device pixel ratio
+    floorPlanCanvas.width = img.width * dpr;
+    floorPlanCanvas.height = img.height * dpr;
+
+    // Set display size via CSS (in CSS pixels)
+    floorPlanCanvas.style.width = img.width + 'px';
+    floorPlanCanvas.style.height = img.height + 'px';
+
     drawFloorPlan(level);
   };
 
@@ -710,8 +779,9 @@ function loadFloorPlan(level) {
 
 // Parse WKT POLYGON format
 function parseWKTPolygon(wkt) {
-  // Extract coordinates from "POLYGON((x1 y1, x2 y2, ...))"
-  const match = wkt.match(/POLYGON\(\((.*?)\)\)/);
+  // Extract coordinates from "POLYGON((x1 y1, x2 y2, ...))" or "POLYGON ((x1 y1, x2 y2, ...))"
+  // Allow optional whitespace between POLYGON and the parentheses
+  const match = wkt.match(/POLYGON\s*\(\((.*?)\)\)/);
   if (!match) return null;
 
   const points = match[1].split(',').map(pair => {
@@ -765,8 +835,8 @@ function drawAreaPolygons(areas) {
     }
     ctx.closePath();
 
-    // Check if this area is selected
-    const isSelected = selectedAreaId === area.area_id;
+    // Check if this area is selected (use unique ID to handle duplicate area_ids)
+    const isSelected = selectedAreaId === area._uniqueId;
 
     // Only draw if selected
     if (isSelected) {
@@ -789,8 +859,19 @@ function drawAreaPolygons(areas) {
 function drawFloorPlan(level) {
   if (!floorPlanImage) return;
 
-  // Clear canvas
+  // Get device pixel ratio
+  const dpr = window.devicePixelRatio || 1;
+
+  // Reset transform and clear canvas
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, floorPlanCanvas.width, floorPlanCanvas.height);
+
+  // Apply scaling for high-DPI displays
+  ctx.scale(dpr, dpr);
+
+  // Disable image smoothing for crisp SVG rendering
+  // (SVG is already vector-based, smoothing can introduce blur)
+  ctx.imageSmoothingEnabled = false;
 
   // Draw floor plan image
   ctx.drawImage(floorPlanImage, 0, 0);

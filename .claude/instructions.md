@@ -173,7 +173,7 @@ Translation strings support placeholders using `{variable}` syntax:
 
 ### **Left Panel: Floor Plan with Panorama Positions**
 
-* Images named `level0.png`, `level1.png`, `level2.png`, `level3.png`, `level4.png`, etc. represent different floors.
+* Images named `level0.svg`, `level1.svg`, `level2.svg`, `level3.svg`, `level4.svg`, etc. represent different floors.
 * The left panel must display the floor plan corresponding to the current panorama’s level.
 * the plan should be display at a height that avoid scrollbars, but as large ad the page allow it.
 * Panorama positions must be plotted on the floor plan. use /equirectangular/icons/Walking_person_top_view.svg to represent each panorama.
@@ -188,8 +188,9 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 * when the use click on an area polygon, load and display the corresponding markdown description in the right panel, instead of the panorama.
 * when the use click on the  Walking_person_top_view.svg that is on top of an area polygon, load the panorama as usual (do not load the area description). 
 
-### **Right Panel: 360° Viewer with Navigation Hotspots**
+### **Right Panel: 360° Viewer with Navigation Hotspots, and Markdown Description**
 
+* When the page is first loaded, the image ./assets/ext.png must be displayed in the right panel. the image must be fully visible, it size be adjusted to fit the panel size.
 * When a panorama is displayed, the application must check which directional links are available.
 * For each available direction, the viewer must create a **navigation hotspot** or arrow.
 * Clicking a hotspot loads the linked panorama.
