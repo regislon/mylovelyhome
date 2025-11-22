@@ -4,7 +4,7 @@
   "pitchLimitDegrees": 60,
   "transitionDuration": 1000,
   "floorPlanIconSize": {
-    "current": 30,
-    "other": 24
+    "current": 60,
+    "other": 48
   }
 }

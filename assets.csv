@@ -1,18 +1,25 @@
 file_path,position_x,position_y,orientation,level,name_fr,name_en
 ./assets/attique.jpg,141,184,100,level2,Attique,Attic
-./assets/chambre_nord_est.jpg,,,,,Chambre nord-est,North-east bedroom
-./assets/chambre_nord_ouest.jpg,,,,,Chambre nord-ouest,North-west bedroom
-./assets/chambre_sud_est.jpg,,,,,Chambre sud-est,South-east bedroom
-./assets/chambre_sud_ouest.jpg,,,,,Chambre sud-ouest,South-west bedroom
-./assets/couloir_1er_nord.jpg,,,,,Couloir 1er ‚ nord,First floor corridor ‚north
-./assets/couloir_1er_sud.jpg,,,,,"Couloir 1er, sud",First floor corridor ‚south
-./assets/entree.jpg,,,,,Entrée,Entrance
-./assets/escalier_attique.jpg,,,,,Escalier attique,Attic staircase
-./assets/escalier_entr√©e.jpg,,,,,Escalier entrée,Entrance staircase
-./assets/reduit_attique.jpg,,,,,Réduit attique,Attic storage
-./assets/salle_de_bain_est.jpg,,,,,Salle de bain est,East bathroom
-./assets/salle_de_bain_ouest.jpg,,,,,Salle de bain ouest,West bathroom
-./assets/terrasse_1er_est.jpg,292,495,90,level1,Terrasse 1er est,First floor terrace ‚ east
-./assets/terrasse_1er_ouest.jpg,47,505,90,level1,Terrasse 1er ouest,First floor terrace ‚ west
+./assets/chambre_nord_est.jpg,433.38361,356.53394,90,level1,Chambre nord-est,North-east bedroom
+./assets/chambre_nord_ouest.jpg,113.15091,358.08023,90,level1,Chambre nord-ouest,North-west bedroom
+./assets/chambre_sud_est.jpg,330.09271,659.29376,90,level1,Chambre sud-est,South-east bedroom
+./assets/chambre_sud_ouest.jpg,187.52654,833.40387,90,level1,Chambre sud-ouest,South-west bedroom
+./assets/couloir_1er_nord.jpg,277.82877,277.82877,90,level1,Couloir 1er ‚ nord,First floor corridor ‚north
+./assets/couloir_1er_sud.jpg,256.49023,537.9115,90,level1,"Couloir 1er, sud",First floor corridor ‚south
+./assets/entree.jpg,44.875012,299.64455,90,level0,Entrée,Entrance
+./assets/escalier_attique.jpg,,,90,,Escalier attique,Attic staircase
+./assets/escalier_entree.jpg,339.52496,93.358643,90,level1,Escalier entrée,Entrance staircase
+./assets/reduit_attique.jpg,,,90,,Réduit attique,Attic storage
+./assets/salle_de_bain_est.jpg,427.35315,108.5121,90,level1,Salle de bain est,East bathroom
+./assets/salle_de_bain_ouest.jpg,127.22198,152.89008,90,level1,Salle de bain ouest,West bathroom
+./assets/terrasse_1er_est.jpg,49.289921,1063.9529,90,level1,Terrasse 1er est,First floor terrace ‚ east
+./assets/terrasse_1er_ouest.jpg,522.75806,1063.0251,90,level1,Terrasse 1er ouest,First floor terrace ‚ west
 ./assets/terrasse_attique_est.jpg,292,495,90,level2,Terrasse attique est,Attic terrace ‚ east
 ./assets/terrasse_attique_ouest.jpg,47,505,0,level2,Terrasse attique ouest,Attic terrace ‚west
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,",",,,,

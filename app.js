@@ -30,8 +30,14 @@ const levelButtons = document.getElementById('level-buttons');
 const levelLabel = document.getElementById('level-label');
 const floorPlanCanvas = document.getElementById('floor-plan-canvas');
 const floorPlanTitle = document.getElementById('floor-plan-title');
-const ctx = floorPlanCanvas.getContext('2d');
+const floorPlanContainer = document.getElementById('floor-plan-container');
 let initialImageContainer = null;
+
+// SVG elements for floor plan
+let floorPlanSvg = null;
+let floorPlanSvgContainer = null;
+let floorPlanOverlayGroup = null;
+let areasOverlayGroup = null;
 
 // Translation function with placeholder support
 function t(key, placeholders = {}) {
@@ -128,6 +134,39 @@ function updateUIText() {
   }
 }
 
+// Initialize SVG-based floor plan
+function initializeFloorPlanSvg() {
+  // Hide the canvas
+  floorPlanCanvas.style.display = 'none';
+
+  // Create SVG container
+  floorPlanSvgContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  floorPlanSvgContainer.id = 'floor-plan-svg';
+  floorPlanSvgContainer.style.cssText = `
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: crosshair;
+  `;
+
+  // Create overlay groups for interactive elements
+  areasOverlayGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  areasOverlayGroup.id = 'areas-overlay';
+
+  floorPlanOverlayGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  floorPlanOverlayGroup.id = 'markers-overlay';
+
+  floorPlanSvgContainer.appendChild(areasOverlayGroup);
+  floorPlanSvgContainer.appendChild(floorPlanOverlayGroup);
+
+  // Add to container
+  floorPlanContainer.appendChild(floorPlanSvgContainer);
+
+  console.log('SVG-based floor plan initialized');
+}
+
 // Initialize the application
 async function init() {
   try {
@@ -158,6 +197,9 @@ async function init() {
 
     // Initialize Photo Sphere Viewer
     initializeViewer();
+
+    // Initialize SVG-based floor plan
+    initializeFloorPlanSvg();
 
     // Load walking person icon first
     await loadWalkingPersonIconAsync();
@@ -343,17 +385,20 @@ function isPointInPolygon(x, y, polygonData) {
   return inside;
 }
 
-// Setup floor plan canvas click listener
+// Setup floor plan SVG click listener
 function setupFloorPlanClickListener() {
-  floorPlanCanvas.addEventListener('click', (event) => {
-    const rect = floorPlanCanvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+  floorPlanContainer.addEventListener('click', (event) => {
+    if (!floorPlanSvgContainer) return;
 
-    // Calculate scale accounting for device pixel ratio
-    const scaleX = (floorPlanCanvas.width / dpr) / rect.width;
-    const scaleY = (floorPlanCanvas.height / dpr) / rect.height;
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
+    // Get SVG coordinates
+    const pt = floorPlanSvgContainer.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+
+    // Transform to SVG coordinate system
+    const svgP = pt.matrixTransform(floorPlanSvgContainer.getScreenCTM().inverse());
+    const x = svgP.x;
+    const y = svgP.y;
 
     const level = currentLevel || (validPanoramas[currentPanoramaIndex]?.level);
 
@@ -728,9 +773,9 @@ function addNavigationMarkers(panorama, markersPlugin) {
 }
 
 // Load floor plan for a specific level
-function loadFloorPlan(level) {
+async function loadFloorPlan(level) {
   // Don't reload if same level
-  if (currentFloorPlanLevel === level && floorPlanImage && floorPlanImage.complete) {
+  if (currentFloorPlanLevel === level && floorPlanSvg) {
     drawFloorPlan(level);
     return;
   }
@@ -745,36 +790,71 @@ function loadFloorPlan(level) {
                     : levelKey;
   floorPlanTitle.textContent = t('floorPlanTitle', { level: levelName });
 
-  const img = new Image();
-  img.onload = () => {
-    floorPlanImage = img;
+  try {
+    // Fetch the SVG file
+    const response = await fetch(floorPlanPath);
+    if (!response.ok) {
+      throw new Error(`Failed to load: ${floorPlanPath}`);
+    }
 
-    // Get device pixel ratio for high-DPI displays (Retina, etc.)
-    const dpr = window.devicePixelRatio || 1;
+    const svgText = await response.text();
 
-    // Set canvas size accounting for device pixel ratio
-    floorPlanCanvas.width = img.width * dpr;
-    floorPlanCanvas.height = img.height * dpr;
+    // Parse the SVG
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+    const loadedSvg = svgDoc.documentElement;
 
-    // Set display size via CSS (in CSS pixels)
-    floorPlanCanvas.style.width = img.width + 'px';
-    floorPlanCanvas.style.height = img.height + 'px';
+    // Get SVG dimensions
+    const width = loadedSvg.getAttribute('width');
+    const height = loadedSvg.getAttribute('height');
+    const viewBox = loadedSvg.getAttribute('viewBox');
 
+    // Remove old floor plan if exists
+    if (floorPlanSvg && floorPlanSvg.parentNode) {
+      floorPlanSvg.parentNode.removeChild(floorPlanSvg);
+    }
+
+    // Create a group for the floor plan
+    floorPlanSvg = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    floorPlanSvg.id = 'floor-plan-base';
+
+    // Copy the content from loaded SVG
+    while (loadedSvg.firstChild) {
+      floorPlanSvg.appendChild(loadedSvg.firstChild);
+    }
+
+    // Insert floor plan as first child (below overlays)
+    floorPlanSvgContainer.insertBefore(floorPlanSvg, floorPlanSvgContainer.firstChild);
+
+    // Set SVG container dimensions
+    if (width && height) {
+      floorPlanSvgContainer.setAttribute('width', width);
+      floorPlanSvgContainer.setAttribute('height', height);
+    }
+    if (viewBox) {
+      floorPlanSvgContainer.setAttribute('viewBox', viewBox);
+    }
+
+    console.log(`Floor plan loaded: ${floorPlanPath}`);
+
+    // Draw overlays
     drawFloorPlan(level);
-  };
 
-  img.onerror = () => {
-    console.warn(`Floor plan not found: ${floorPlanPath}`);
-    ctx.clearRect(0, 0, floorPlanCanvas.width, floorPlanCanvas.height);
-    ctx.fillStyle = '#333';
-    ctx.fillRect(0, 0, floorPlanCanvas.width, floorPlanCanvas.height);
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(t('floorPlanNotAvailable'), floorPlanCanvas.width / 2, floorPlanCanvas.height / 2);
-  };
+  } catch (error) {
+    console.error('Error loading floor plan:', error);
+    // Show error in SVG
+    floorPlanSvgContainer.setAttribute('width', '400');
+    floorPlanSvgContainer.setAttribute('height', '300');
+    floorPlanSvgContainer.setAttribute('viewBox', '0 0 400 300');
 
-  img.src = floorPlanPath;
+    const errorText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    errorText.setAttribute('x', '200');
+    errorText.setAttribute('y', '150');
+    errorText.setAttribute('text-anchor', 'middle');
+    errorText.setAttribute('fill', '#fff');
+    errorText.textContent = t('floorPlanNotAvailable');
+    floorPlanSvgContainer.appendChild(errorText);
+  }
 }
 
 // Parse WKT POLYGON format
@@ -792,7 +872,72 @@ function parseWKTPolygon(wkt) {
   return points;
 }
 
-// Draw area polygons on floor plan
+// Draw area polygons on floor plan (SVG version)
+function drawAreaPolygonsSvg(areas) {
+  areas.forEach(area => {
+    console.log('Drawing area:', area.name_en || area.area_id);
+
+    // Support both 'polygon' and 'polygon_wkt' columns
+    const polygonData = area.polygon || area.polygon_wkt;
+    if (!polygonData || polygonData.trim() === '') {
+      console.warn('Area missing polygon:', area);
+      return;
+    }
+
+    // Parse polygon - either WKT format or comma-separated
+    let points;
+    if (polygonData.startsWith('POLYGON')) {
+      points = parseWKTPolygon(polygonData);
+      if (!points) {
+        console.warn('Failed to parse WKT polygon:', polygonData);
+        return;
+      }
+    } else {
+      // Parse comma-separated: "x1,y1,x2,y2,..."
+      const coords = polygonData.split(',').map(v => parseFloat(v.trim()));
+      if (coords.length < 6) {
+        console.warn('Polygon has too few points:', coords.length);
+        return;
+      }
+      points = [];
+      for (let i = 0; i < coords.length; i += 2) {
+        points.push([coords[i], coords[i + 1]]);
+      }
+    }
+
+    console.log('Polygon points:', points);
+
+    // Check if this area is selected (use unique ID to handle duplicate area_ids)
+    const isSelected = selectedAreaId === area._uniqueId;
+
+    // Only draw if selected
+    if (isSelected) {
+      // Create SVG path
+      const pathData = points.map((point, index) => {
+        const command = index === 0 ? 'M' : 'L';
+        return `${command} ${point[0]} ${point[1]}`;
+      }).join(' ') + ' Z';
+
+      const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      polygon.setAttribute('d', pathData);
+
+      // Fill with semi-transparent color
+      const fillColor = area.fill_color || 'rgba(100, 150, 200, 0.3)';
+      polygon.setAttribute('fill', fillColor);
+
+      // Border
+      const borderColor = area.border_color || area.color || '#4299e1';
+      polygon.setAttribute('stroke', borderColor);
+      polygon.setAttribute('stroke-width', '3');
+      polygon.setAttribute('data-area-id', area._uniqueId);
+
+      areasOverlayGroup.appendChild(polygon);
+    }
+    // When not selected: no fill, no border (fully transparent)
+  });
+}
+
+// Draw area polygons on floor plan (Canvas version - kept for reference)
 function drawAreaPolygons(areas) {
   areas.forEach(area => {
     console.log('Drawing area:', area.name_en || area.area_id);
@@ -855,31 +1000,22 @@ function drawAreaPolygons(areas) {
   });
 }
 
-// Draw floor plan with panorama markers
+// Draw floor plan with panorama markers (SVG version)
 function drawFloorPlan(level) {
-  if (!floorPlanImage) return;
+  if (!floorPlanSvg) return;
 
-  // Get device pixel ratio
-  const dpr = window.devicePixelRatio || 1;
+  // Clear overlay groups
+  while (areasOverlayGroup.firstChild) {
+    areasOverlayGroup.removeChild(areasOverlayGroup.firstChild);
+  }
+  while (floorPlanOverlayGroup.firstChild) {
+    floorPlanOverlayGroup.removeChild(floorPlanOverlayGroup.firstChild);
+  }
 
-  // Reset transform and clear canvas
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, floorPlanCanvas.width, floorPlanCanvas.height);
-
-  // Apply scaling for high-DPI displays
-  ctx.scale(dpr, dpr);
-
-  // Disable image smoothing for crisp SVG rendering
-  // (SVG is already vector-based, smoothing can introduce blur)
-  ctx.imageSmoothingEnabled = false;
-
-  // Draw floor plan image
-  ctx.drawImage(floorPlanImage, 0, 0);
-
-  // Draw area polygons for this level (below icons)
+  // Draw area polygons for this level (below markers)
   const areasOnLevel = allAreas.filter(a => a.level === level);
   console.log(`Drawing ${areasOnLevel.length} areas for level ${level}`, areasOnLevel);
-  drawAreaPolygons(areasOnLevel);
+  drawAreaPolygonsSvg(areasOnLevel);
 
   // Draw panorama markers for this level
   const panoramasOnLevel = validPanoramas.filter(p => p.level === level);
@@ -894,47 +1030,54 @@ function drawFloorPlan(level) {
     const useIcon = walkingPersonIcon && walkingPersonIcon.complete && walkingPersonIcon.naturalWidth > 0;
 
     if (useIcon) {
-      const iconSize = isCurrentPanorama ? 30 : 24;
+      const iconSize = isCurrentPanorama ? 60 : 48;
 
       // Add highlight for current panorama
       if (isCurrentPanorama) {
-        ctx.beginPath();
-        ctx.arc(x, y, iconSize * 0.7, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(66, 153, 225, 0.3)';
-        ctx.fill();
-        ctx.strokeStyle = '#4299e1';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        highlight.setAttribute('cx', x);
+        highlight.setAttribute('cy', y);
+        highlight.setAttribute('r', iconSize * 0.7);
+        highlight.setAttribute('fill', 'rgba(66, 153, 225, 0.3)');
+        highlight.setAttribute('stroke', '#4299e1');
+        highlight.setAttribute('stroke-width', '2');
+        floorPlanOverlayGroup.appendChild(highlight);
       }
 
       // Get orientation and current viewer yaw (for current panorama only)
       let rotation = 0;
       if (panorama.orientation && panorama.orientation.trim() !== '') {
-        // Convert orientation from degrees to radians
-        rotation = (parseFloat(panorama.orientation) * Math.PI) / 180;
+        // Convert orientation from degrees to radians, then to degrees for SVG
+        rotation = parseFloat(panorama.orientation);
       }
 
       // Add current viewer rotation for the active panorama
       if (isCurrentPanorama && viewer) {
         const position = viewer.getPosition();
-        rotation += position.yaw;
+        rotation += (position.yaw * 180) / Math.PI;
       }
 
       // Draw the walking person icon with rotation
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(rotation);
-      ctx.drawImage(walkingPersonIcon, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
-      ctx.restore();
+      const iconImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      iconImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', walkingPersonIcon.src);
+      iconImg.setAttribute('x', x - iconSize / 2);
+      iconImg.setAttribute('y', y - iconSize / 2);
+      iconImg.setAttribute('width', iconSize);
+      iconImg.setAttribute('height', iconSize);
+      iconImg.setAttribute('transform', `rotate(${rotation}, ${x}, ${y})`);
+      iconImg.setAttribute('data-panorama-index', validPanoramas.indexOf(panorama));
+      floorPlanOverlayGroup.appendChild(iconImg);
     } else {
       // Fallback to circle if icon not loaded
-      ctx.beginPath();
-      ctx.arc(x, y, isCurrentPanorama ? 10 : 8, 0, 2 * Math.PI);
-      ctx.fillStyle = isCurrentPanorama ? '#4299e1' : '#48bb78';
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      marker.setAttribute('cx', x);
+      marker.setAttribute('cy', y);
+      marker.setAttribute('r', isCurrentPanorama ? 20 : 16);
+      marker.setAttribute('fill', isCurrentPanorama ? '#4299e1' : '#48bb78');
+      marker.setAttribute('stroke', '#fff');
+      marker.setAttribute('stroke-width', '2');
+      marker.setAttribute('data-panorama-index', validPanoramas.indexOf(panorama));
+      floorPlanOverlayGroup.appendChild(marker);
     }
 
     // Draw label (optional - only for current panorama)
@@ -942,12 +1085,26 @@ function drawFloorPlan(level) {
       const label = (currentLanguage === 'fr' ? panorama.name_fr : panorama.name_en)
                     || panorama.name_en || panorama.name_fr || '';
       if (label) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(x + 15, y - 10, ctx.measureText(label).width + 10, 20);
-        ctx.fillStyle = '#fff';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(label, x + 20, y + 4);
+        const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+        const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        labelBg.setAttribute('x', x + 15);
+        labelBg.setAttribute('y', y - 10);
+        labelBg.setAttribute('width', label.length * 7 + 10);
+        labelBg.setAttribute('height', 20);
+        labelBg.setAttribute('fill', 'rgba(0, 0, 0, 0.7)');
+        labelGroup.appendChild(labelBg);
+
+        const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        labelText.setAttribute('x', x + 20);
+        labelText.setAttribute('y', y + 4);
+        labelText.setAttribute('fill', '#fff');
+        labelText.setAttribute('font-size', '12');
+        labelText.setAttribute('font-family', 'sans-serif');
+        labelText.textContent = label;
+        labelGroup.appendChild(labelText);
+
+        floorPlanOverlayGroup.appendChild(labelGroup);
       }
     }
   });
