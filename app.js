@@ -721,7 +721,7 @@ function setupRotationListener() {
     if (now - lastUpdate < 100) return; // Throttle to 100ms
     lastUpdate = now;
 
-    if (currentFloorPlanLevel && floorPlanImage) {
+    if (currentFloorPlanLevel && floorPlanSvg) {
       drawFloorPlan(currentFloorPlanLevel);
     }
   });
