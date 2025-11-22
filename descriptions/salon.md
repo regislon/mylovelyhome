@@ -1,5 +1,7 @@
 # Attique
 
+📐 
+
 Cette pièce située au dernier étage offre une vue dégagée sur les environs. Grâce à ses grandes fenêtres, elle bénéficie d’un apport important en lumière naturelle. Avec une superficie d’environ **50 m²**, l’attique offre un espace confortable pouvant servir de séjour, de zone de détente ou de pièce polyvalente selon les besoins.
 
 ## Cuisine
