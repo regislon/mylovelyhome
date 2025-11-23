@@ -189,6 +189,9 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 * when an area is selected, unselected any Walking_person_top_view.svg that could be selected.
 * when the use click on an area polygon, load and display the corresponding markdown description in the right panel, instead of the panorama.
 * when the use click on the  Walking_person_top_view.svg that is on top of an area polygon, load the panorama as usual (do not load the area description). 
+* when the user move the cursor on the floor plan, change the type of the cursor to a pointer when over a clickable element (area polygon or panorama marker) : 
+
+
 
 ### **Right Panel: 360° Viewer with Navigation Hotspots, and Markdown Description**
 

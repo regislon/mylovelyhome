@@ -1089,18 +1089,19 @@ function drawAreaPolygonsSvg(areas) {
     // Check if this area is selected (use unique ID to handle duplicate area_ids)
     const isSelected = selectedAreaId === area._uniqueId;
 
-    // Only draw if selected
+    // Create SVG path (always draw, even if not selected)
+    const pathData = points.map((point, index) => {
+      const command = index === 0 ? 'M' : 'L';
+      return `${command} ${point[0]} ${point[1]}`;
+    }).join(' ') + ' Z';
+
+    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    polygon.setAttribute('d', pathData);
+    polygon.setAttribute('data-area-id', area._uniqueId);
+    polygon.style.cursor = 'default';
+
     if (isSelected) {
-      // Create SVG path
-      const pathData = points.map((point, index) => {
-        const command = index === 0 ? 'M' : 'L';
-        return `${command} ${point[0]} ${point[1]}`;
-      }).join(' ') + ' Z';
-
-      const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      polygon.setAttribute('d', pathData);
-
-      // Fill with semi-transparent color
+      // Fill with semi-transparent color when selected
       const fillColor = area.fill_color || 'rgba(100, 150, 200, 0.3)';
       polygon.setAttribute('fill', fillColor);
 
@@ -1108,11 +1109,13 @@ function drawAreaPolygonsSvg(areas) {
       const borderColor = area.border_color || area.color || '#4299e1';
       polygon.setAttribute('stroke', borderColor);
       polygon.setAttribute('stroke-width', '3');
-      polygon.setAttribute('data-area-id', area._uniqueId);
-
-      areasOverlayGroup.appendChild(polygon);
+    } else {
+      // Transparent when not selected (but still clickable)
+      polygon.setAttribute('fill', 'transparent');
+      polygon.setAttribute('stroke', 'none');
     }
-    // When not selected: no fill, no border (fully transparent)
+
+    areasOverlayGroup.appendChild(polygon);
   });
 }
 
@@ -1245,6 +1248,7 @@ function drawFloorPlan(level) {
       iconImg.setAttribute('height', iconSize);
       iconImg.setAttribute('transform', `rotate(${rotation}, ${x}, ${y})`);
       iconImg.setAttribute('data-panorama-index', validPanoramas.indexOf(panorama));
+      iconImg.style.cursor = 'grab';
       floorPlanOverlayGroup.appendChild(iconImg);
     } else {
       // Fallback to circle if icon not loaded
@@ -1256,6 +1260,7 @@ function drawFloorPlan(level) {
       marker.setAttribute('stroke', '#fff');
       marker.setAttribute('stroke-width', '2');
       marker.setAttribute('data-panorama-index', validPanoramas.indexOf(panorama));
+      marker.style.cursor = 'grab';
       floorPlanOverlayGroup.appendChild(marker);
     }
 
