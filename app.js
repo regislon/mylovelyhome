@@ -474,54 +474,46 @@ async function loadGeneralDescription() {
   }
 }
 
-// Load and display help description from help.md
+// Load and display help description from help.md as modal popup
 async function loadHelpDescription() {
-  console.log('Loading help description');
-  currentViewMode = 'area';
+  console.log('Loading help description as modal');
 
-  // Deselect any selected area
-  selectedAreaId = null;
-
-  // Hide viewer and initial image, show markdown container
-  hideInitialImage();
-  viewerContainer.style.display = 'none';
-
-  // Create or get markdown container
-  let markdownContainer = document.getElementById('markdown-container');
-  if (!markdownContainer) {
-    markdownContainer = document.createElement('div');
-    markdownContainer.id = 'markdown-container';
-    markdownContainer.style.cssText = `
-      width: 100%;
-      height: 100%;
-      padding: 30px 40px;
-      overflow-y: auto;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      color: #333;
-    `;
-    viewerContainer.parentElement.appendChild(markdownContainer);
+  // Check if modal already exists, remove it
+  const existingModal = document.getElementById('help-modal');
+  if (existingModal) {
+    existingModal.remove();
   }
-  markdownContainer.style.display = 'block';
 
-  // Add close button if it doesn't exist
-  if (!markdownContainer.querySelector('.markdown-close-btn')) {
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'markdown-close-btn';
-    closeBtn.innerHTML = '×';
-    closeBtn.onclick = () => {
-      selectedAreaId = null;
-      currentViewMode = 'panorama';
-      markdownContainer.style.display = 'none';
-      viewerContainer.style.display = 'block';
-      if (currentFloorPlanLevel && floorPlanSvg) {
-        drawFloorPlan(currentFloorPlanLevel);
-      }
-    };
-    markdownContainer.appendChild(closeBtn);
-  }
+  // Create modal overlay
+  const modalOverlay = document.createElement('div');
+  modalOverlay.id = 'help-modal';
+  modalOverlay.className = 'modal-overlay';
+
+  // Create modal content container
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+
+  // Create close button
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close-btn';
+  closeBtn.innerHTML = '×';
+  closeBtn.onclick = () => {
+    modalOverlay.remove();
+  };
+
+  // Close modal when clicking on overlay (backdrop)
+  modalOverlay.onclick = (e) => {
+    if (e.target === modalOverlay) {
+      modalOverlay.remove();
+    }
+  };
+
+  // Prevent clicks on modal content from closing the modal
+  modalContent.onclick = (e) => {
+    e.stopPropagation();
+  };
+
+  modalContent.appendChild(closeBtn);
 
   // Load help.md file
   try {
@@ -530,18 +522,25 @@ async function loadHelpDescription() {
       const markdown = await response.text();
       // Enhanced markdown rendering with styling
       const html = convertMarkdownToHTML(markdown, 'descriptions/');
-      markdownContainer.innerHTML = `
-        <div class="markdown-content">
-          ${html}
-        </div>
-      `;
+
+      const markdownDiv = document.createElement('div');
+      markdownDiv.className = 'modal-markdown-content markdown-content';
+      markdownDiv.innerHTML = html;
+
+      modalContent.appendChild(markdownDiv);
     } else {
-      markdownContainer.innerHTML = `<p>${t('area.descriptionNotFound', { file: 'descriptions/help.md' })}</p>`;
+      modalContent.innerHTML += `<div class="modal-markdown-content"><p>${t('area.descriptionNotFound', { file: 'descriptions/help.md' })}</p></div>`;
     }
   } catch (error) {
     console.error('Failed to load help description:', error);
-    markdownContainer.innerHTML = `<p>${t('area.errorLoading')}</p>`;
+    modalContent.innerHTML += `<div class="modal-markdown-content"><p>${t('area.errorLoading')}</p></div>`;
   }
+
+  // Add modal content to overlay
+  modalOverlay.appendChild(modalContent);
+
+  // Add modal to page
+  document.body.appendChild(modalOverlay);
 }
 
 // Setup floor plan SVG click listener
