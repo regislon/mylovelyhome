@@ -1,3 +1,3 @@
 # Toilette
 
-📐 XXm²
+📐 2m²

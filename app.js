@@ -535,7 +535,6 @@ async function loadAreaDescription(area) {
       height: 100%;
       padding: 30px 40px;
       overflow-y: auto;
-      background: #ffffff;
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       font-size: 16px;
@@ -545,6 +544,23 @@ async function loadAreaDescription(area) {
     viewerContainer.parentElement.appendChild(markdownContainer);
   }
   markdownContainer.style.display = 'block';
+
+  // Add close button if it doesn't exist
+  if (!markdownContainer.querySelector('.markdown-close-btn')) {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'markdown-close-btn';
+    closeBtn.innerHTML = '×';
+    closeBtn.onclick = () => {
+      selectedAreaId = null;
+      currentViewMode = 'panorama';
+      markdownContainer.style.display = 'none';
+      viewerContainer.style.display = 'block';
+      if (currentFloorPlanLevel && floorPlanSvg) {
+        drawFloorPlan(currentFloorPlanLevel);
+      }
+    };
+    markdownContainer.appendChild(closeBtn);
+  }
 
   // Load markdown file
   if (area.description_file && area.description_file.trim() !== '') {
@@ -597,6 +613,8 @@ function convertMarkdownToHTML(markdown, basePath = '') {
     // Bold and italic
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    // Lines starting with 📐 - special styling
+    .replace(/^📐(.+)$/gim, '<p class="area-measurement">📐$1</p>')
     // Unordered lists
     .replace(/^\* (.+)$/gim, '<li>$1</li>')
     .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
@@ -610,7 +628,10 @@ function convertMarkdownToHTML(markdown, basePath = '') {
     .replace(/<p><img/g, '<img')
     .replace(/<\/p><\/p>/g, '</p>')
     .replace(/<p><ul>/g, '<ul>')
-    .replace(/<\/ul><\/p>/g, '</ul>');
+    .replace(/<\/ul><\/p>/g, '</ul>')
+    // Clean up double-wrapped area-measurement paragraphs
+    .replace(/<p><p class="area-measurement">/g, '<p class="area-measurement">')
+    .replace(/<\/p><\/p>/g, '</p>');
 }
 
 // Close markdown view and return to panorama
