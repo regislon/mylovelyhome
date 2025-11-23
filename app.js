@@ -31,6 +31,8 @@ const levelLabel = document.getElementById('level-label');
 const floorPlanCanvas = document.getElementById('floor-plan-canvas');
 const floorPlanTitle = document.getElementById('floor-plan-title');
 const floorPlanContainer = document.getElementById('floor-plan-container');
+const generalDescriptionBtn = document.getElementById('general-description-btn');
+const helpBtn = document.getElementById('help-btn');
 let initialImageContainer = null;
 
 // SVG elements for floor plan
@@ -113,6 +115,7 @@ function updateUIText() {
   // Update labels
   levelLabel.textContent = t('floor') + ':';
   loadingElement.textContent = t('loading');
+  generalDescriptionBtn.textContent = t('generalDescription');
 
   // Update controls
   populateLevelButtons();
@@ -210,6 +213,8 @@ async function init() {
     // Setup event listeners
     setupLevelButtonsListener();
     setupFloorPlanClickListener();
+    setupGeneralDescriptionListener();
+    setupHelpButtonListener();
 
     // Initialize UI text
     updateUIText();
@@ -383,6 +388,160 @@ function isPointInPolygon(x, y, polygonData) {
     if (intersect) inside = !inside;
   }
   return inside;
+}
+
+// Setup general description button listener
+function setupGeneralDescriptionListener() {
+  generalDescriptionBtn.addEventListener('click', () => {
+    loadGeneralDescription();
+  });
+}
+
+// Setup help button listener
+function setupHelpButtonListener() {
+  helpBtn.addEventListener('click', () => {
+    loadHelpDescription();
+  });
+}
+
+// Load and display general description from main.md
+async function loadGeneralDescription() {
+  console.log('Loading general description');
+  currentViewMode = 'area';
+
+  // Deselect any selected area
+  selectedAreaId = null;
+
+  // Hide viewer and initial image, show markdown container
+  hideInitialImage();
+  viewerContainer.style.display = 'none';
+
+  // Create or get markdown container
+  let markdownContainer = document.getElementById('markdown-container');
+  if (!markdownContainer) {
+    markdownContainer = document.createElement('div');
+    markdownContainer.id = 'markdown-container';
+    markdownContainer.style.cssText = `
+      width: 100%;
+      height: 100%;
+      padding: 30px 40px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    `;
+    viewerContainer.parentElement.appendChild(markdownContainer);
+  }
+  markdownContainer.style.display = 'block';
+
+  // Add close button if it doesn't exist
+  if (!markdownContainer.querySelector('.markdown-close-btn')) {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'markdown-close-btn';
+    closeBtn.innerHTML = '×';
+    closeBtn.onclick = () => {
+      selectedAreaId = null;
+      currentViewMode = 'panorama';
+      markdownContainer.style.display = 'none';
+      viewerContainer.style.display = 'block';
+      if (currentFloorPlanLevel && floorPlanSvg) {
+        drawFloorPlan(currentFloorPlanLevel);
+      }
+    };
+    markdownContainer.appendChild(closeBtn);
+  }
+
+  // Load main.md file
+  try {
+    const response = await fetch('descriptions/main.md');
+    if (response.ok) {
+      const markdown = await response.text();
+      // Enhanced markdown rendering with styling
+      const html = convertMarkdownToHTML(markdown, 'descriptions/');
+      markdownContainer.innerHTML = `
+        <div class="markdown-content">
+          ${html}
+        </div>
+      `;
+    } else {
+      markdownContainer.innerHTML = `<p>${t('area.descriptionNotFound', { file: 'descriptions/main.md' })}</p>`;
+    }
+  } catch (error) {
+    console.error('Failed to load main description:', error);
+    markdownContainer.innerHTML = `<p>${t('area.errorLoading')}</p>`;
+  }
+}
+
+// Load and display help description from help.md
+async function loadHelpDescription() {
+  console.log('Loading help description');
+  currentViewMode = 'area';
+
+  // Deselect any selected area
+  selectedAreaId = null;
+
+  // Hide viewer and initial image, show markdown container
+  hideInitialImage();
+  viewerContainer.style.display = 'none';
+
+  // Create or get markdown container
+  let markdownContainer = document.getElementById('markdown-container');
+  if (!markdownContainer) {
+    markdownContainer = document.createElement('div');
+    markdownContainer.id = 'markdown-container';
+    markdownContainer.style.cssText = `
+      width: 100%;
+      height: 100%;
+      padding: 30px 40px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    `;
+    viewerContainer.parentElement.appendChild(markdownContainer);
+  }
+  markdownContainer.style.display = 'block';
+
+  // Add close button if it doesn't exist
+  if (!markdownContainer.querySelector('.markdown-close-btn')) {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'markdown-close-btn';
+    closeBtn.innerHTML = '×';
+    closeBtn.onclick = () => {
+      selectedAreaId = null;
+      currentViewMode = 'panorama';
+      markdownContainer.style.display = 'none';
+      viewerContainer.style.display = 'block';
+      if (currentFloorPlanLevel && floorPlanSvg) {
+        drawFloorPlan(currentFloorPlanLevel);
+      }
+    };
+    markdownContainer.appendChild(closeBtn);
+  }
+
+  // Load help.md file
+  try {
+    const response = await fetch('descriptions/help.md');
+    if (response.ok) {
+      const markdown = await response.text();
+      // Enhanced markdown rendering with styling
+      const html = convertMarkdownToHTML(markdown, 'descriptions/');
+      markdownContainer.innerHTML = `
+        <div class="markdown-content">
+          ${html}
+        </div>
+      `;
+    } else {
+      markdownContainer.innerHTML = `<p>${t('area.descriptionNotFound', { file: 'descriptions/help.md' })}</p>`;
+    }
+  } catch (error) {
+    console.error('Failed to load help description:', error);
+    markdownContainer.innerHTML = `<p>${t('area.errorLoading')}</p>`;
+  }
 }
 
 // Setup floor plan SVG click listener

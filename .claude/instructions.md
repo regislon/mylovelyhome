@@ -168,6 +168,8 @@ Translation strings support placeholders using `{variable}` syntax:
 ### **Top Menu**
 
 * A top menu must include one button for each floor level found in the CSV. only one floor can be selected at a time.
+* Add a button "description générale" that when clicked display the main description from descriptions/main.md in the right panel.
+* in the top right corner, add a button "?" that when clicked display the help description from descriptions/help.md as popup window in 
 * No other button should be present
 
 

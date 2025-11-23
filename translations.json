@@ -14,6 +14,7 @@
     "noValidPanoramas": "No valid panoramas found. Ensure panoramas have file_path, position_x, position_y, and level fields filled.",
     "failedToInitialize": "Failed to initialize: {error}",
     "failedToLoadPanorama": "Failed to load panorama: {path}",
+    "generalDescription": "General Description",
     "navigation": {
       "north": "North ↑",
       "east": "East →",
@@ -43,6 +44,7 @@
     "noValidPanoramas": "Aucun panorama valide trouvé. Assurez-vous que les panoramas ont les champs file_path, position_x, position_y et level remplis.",
     "failedToInitialize": "Échec de l'initialisation : {error}",
     "failedToLoadPanorama": "Échec du chargement du panorama : {path}",
+    "generalDescription": "Description générale",
     "navigation": {
       "north": "Nord ↑",
       "east": "Est →",
