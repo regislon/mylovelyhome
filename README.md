@@ -1,4 +1,4 @@
-# 360° Panorama Viewer
+# Villardiez 8
 
 A fully client-side web application for displaying and navigating through equirectangular (360°) panoramic images, similar to Google Street View.
 
