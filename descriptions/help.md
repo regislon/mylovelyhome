@@ -22,3 +22,6 @@ Sur le plan d'étage (panneau de gauche), cliquez directement sur une zone du pl
   - **Molette de la souris** ou **pincement** pour zoomer/dézoomer
   - Cliquez sur les **flèches directionnelles** (Nord ↑, Est →, Sud ↓, Ouest ←) pour vous déplacer vers les pièces connectées
 
+## Contact
+Pour toute question ou demande d'information supplémentaire, n'hésitez pas à nous contacter *villardiez8@lonco.ch*
+

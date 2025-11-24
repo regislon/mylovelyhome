@@ -28,8 +28,7 @@ body {
   right: 20px;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background-color: rgba(66, 153, 225, 0.9);
+  background-color: rgba(0, 0, 0, 0.9);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.3);
   font-size: 24px;
@@ -40,13 +39,11 @@ body {
   justify-content: center;
   z-index: 200;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .help-button:hover {
-  background-color: rgba(66, 153, 225, 1);
+  background-color: rgba(0, 0, 0, 1);
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .help-button:active {
@@ -87,7 +84,6 @@ body {
   padding: 8px 16px;
   font-size: 0.9rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.1);
   color: #fff;
   cursor: pointer;
@@ -104,9 +100,8 @@ body {
 }
 
 .level-button.active {
-  background-color: rgba(66, 153, 225, 0.8);
-  border-color: rgba(66, 153, 225, 1);
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  background-color: rgba(0, 0, 0, 0.8);
+  border-color: rgba(255, 255, 255, 1);
 }
 
 .level-button:active {
@@ -189,7 +184,6 @@ body {
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.8);
   padding: 2rem 3rem;
-  border-radius: 8px;
 }
 
 /* Error message */
@@ -198,11 +192,10 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #ff6b6b;
+  color: #fff;
   background-color: rgba(0, 0, 0, 0.9);
   padding: 2rem 3rem;
-  border-radius: 8px;
-  border: 2px solid #ff6b6b;
+  border: 2px solid #fff;
   max-width: 80%;
   text-align: center;
   z-index: 1000;
@@ -211,29 +204,33 @@ body {
 
 /* Navigation markers */
 .navigation-marker {
-  background-color: rgba(66, 153, 225, 0.9);
+  background-color: rgba(0, 0, 0, 0.9);
   color: white;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
   font-size: 0.9rem;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #fff;
   text-align: center;
   user-select: none;
 }
 
 .navigation-marker:hover {
-  background-color: rgba(66, 153, 225, 1);
+  background-color: rgba(0, 0, 0, 1);
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 /* Markdown container - modern card style */
 #markdown-container {
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  position: relative;
+  background: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  overflow-y: auto;
   animation: fadeIn 0.3s ease-in;
 }
 
@@ -253,9 +250,8 @@ body {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
-  border-radius: 4px;
+  background: #000;
+  border: 2px solid #fff;
   width: 40px;
   height: 40px;
   cursor: pointer;
@@ -263,29 +259,26 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: #666;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #fff;
   transition: all 0.2s ease;
-  z-index: 10;
+  z-index: 200;
 }
 
 .markdown-close-btn:hover {
-  background: #fff;
-  color: #333;
+  background: #333;
+  color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Markdown content styling */
 .markdown-content {
-  max-width: 900px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
   background: white;
-  padding: 40px 50px;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 80px 50px 50px 50px;
   animation: slideUp 0.4s ease-out;
-  border-top: 3px solid #4299e1;
+  box-sizing: border-box;
 }
 
 @keyframes slideUp {
@@ -303,7 +296,7 @@ body {
   font-size: 2.5em;
   font-weight: 700;
   margin-bottom: 0.3em;
-  color: #4299e1;
+  color: #000;
   line-height: 1.2;
 }
 
@@ -312,10 +305,10 @@ body {
   font-weight: 600;
   margin-top: 2em;
   margin-bottom: 0.8em;
-  color: #2d3748;
+  color: #000;
   line-height: 1.3;
   padding-bottom: 0.3em;
-  border-bottom: 3px solid #e2e8f0;
+  border-bottom: 2px solid #000;
 }
 
 .markdown-content h3 {
@@ -323,14 +316,14 @@ body {
   font-weight: 600;
   margin-top: 1.5em;
   margin-bottom: 0.6em;
-  color: #4a5568;
+  color: #000;
   line-height: 1.4;
 }
 
 .markdown-content p {
   margin-bottom: 1.2em;
   line-height: 1.8;
-  color: #2d3748;
+  color: #000;
   font-size: 1.05em;
 }
 
@@ -342,37 +335,32 @@ body {
 .markdown-content li {
   margin-bottom: 0.7em;
   line-height: 1.7;
-  color: #4a5568;
+  color: #000;
 }
 
 .markdown-content li::marker {
-  color: #4299e1;
+  color: #000;
 }
 
 .markdown-content strong {
   font-weight: 600;
-  color: #1a202c;
-  background: rgba(66, 153, 225, 0.1);
-  padding: 0 4px;
-  border-radius: 2px;
+  color: #000;
 }
 
 .markdown-content em {
   font-style: italic;
-  color: #4a5568;
+  color: #000;
 }
 
 .markdown-content a {
-  color: #4299e1;
-  text-decoration: none;
-  border-bottom: 2px solid transparent;
+  color: #000;
+  text-decoration: underline;
   transition: all 0.2s ease;
   font-weight: 500;
 }
 
 .markdown-content a:hover {
-  color: #2b6cb0;
-  border-bottom-color: #2b6cb0;
+  color: #666;
 }
 
 .markdown-image {
@@ -380,25 +368,17 @@ body {
   height: auto;
   display: block;
   margin: 2em auto;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.markdown-image:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 12px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid #000;
 }
 
 /* Blue box styling for lines starting with 📐 */
 .markdown-content .area-measurement {
-  background: rgba(66, 153, 225, 0.1);
+  background: #fff;
   padding: 12px 20px;
-  border-radius: 4px;
-  border: 2px solid #4299e1;
+  border: 2px solid #000;
   margin: 1em 0;
   font-weight: 500;
-  color: #2d3748;
+  color: #000;
   display: inline-block;
   font-size: 1.1em;
 }
@@ -421,13 +401,12 @@ body {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  border-radius: 8px;
+  background: #fff;
   max-width: 900px;
   max-height: 90vh;
   width: 100%;
   overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 2px solid #000;
   position: relative;
   animation: slideUp 0.4s ease-out;
 }
@@ -436,9 +415,8 @@ body {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
-  border-radius: 50%;
+  background: #000;
+  border: 2px solid #fff;
   width: 40px;
   height: 40px;
   cursor: pointer;
@@ -446,23 +424,20 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: #666;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #fff;
   transition: all 0.2s ease;
   z-index: 10;
 }
 
 .modal-close-btn:hover {
-  background: #fff;
-  color: #333;
+  background: #333;
+  color: #fff;
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .modal-markdown-content {
   padding: 40px 50px;
   background: white;
-  border-radius: 8px;
   margin: 0;
 }
 
@@ -523,8 +498,7 @@ body {
   }
 
   .markdown-content {
-    padding: 25px 20px !important;
-    border-radius: 4px !important;
+    padding: 60px 20px 20px 20px !important;
   }
 
   .markdown-content h1 {
@@ -541,7 +515,6 @@ body {
 
   .markdown-image {
     margin: 1em 0;
-    border-radius: 4px;
   }
 
   .markdown-close-btn {

@@ -1102,11 +1102,11 @@ function drawAreaPolygonsSvg(areas) {
 
     if (isSelected) {
       // Fill with semi-transparent color when selected
-      const fillColor = area.fill_color || 'rgba(100, 150, 200, 0.3)';
+      const fillColor = area.fill_color || 'rgba(0, 0, 0, 0.1)';
       polygon.setAttribute('fill', fillColor);
 
       // Border
-      const borderColor = area.border_color || area.color || '#4299e1';
+      const borderColor = area.border_color || area.color || '#000';
       polygon.setAttribute('stroke', borderColor);
       polygon.setAttribute('stroke-width', '3');
     } else {
@@ -1168,12 +1168,12 @@ function drawAreaPolygons(areas) {
     // Only draw if selected
     if (isSelected) {
       // Fill with semi-transparent color
-      const fillColor = area.fill_color || 'rgba(100, 150, 200, 0.3)';
+      const fillColor = area.fill_color || 'rgba(0, 0, 0, 0.1)';
       ctx.fillStyle = fillColor;
       ctx.fill();
 
       // Border
-      const borderColor = area.border_color || area.color || '#4299e1';
+      const borderColor = area.border_color || area.color || '#000';
       ctx.strokeStyle = borderColor;
       ctx.lineWidth = 3;
       ctx.stroke();
@@ -1220,8 +1220,8 @@ function drawFloorPlan(level) {
         highlight.setAttribute('cx', x);
         highlight.setAttribute('cy', y);
         highlight.setAttribute('r', iconSize * 0.7);
-        highlight.setAttribute('fill', 'rgba(66, 153, 225, 0.3)');
-        highlight.setAttribute('stroke', '#4299e1');
+        highlight.setAttribute('fill', 'rgba(0, 0, 0, 0.2)');
+        highlight.setAttribute('stroke', '#000');
         highlight.setAttribute('stroke-width', '2');
         floorPlanOverlayGroup.appendChild(highlight);
       }
@@ -1256,7 +1256,7 @@ function drawFloorPlan(level) {
       marker.setAttribute('cx', x);
       marker.setAttribute('cy', y);
       marker.setAttribute('r', isCurrentPanorama ? 20 : 16);
-      marker.setAttribute('fill', isCurrentPanorama ? '#4299e1' : '#48bb78');
+      marker.setAttribute('fill', isCurrentPanorama ? '#000' : '#666');
       marker.setAttribute('stroke', '#fff');
       marker.setAttribute('stroke-width', '2');
       marker.setAttribute('data-panorama-index', validPanoramas.indexOf(panorama));
