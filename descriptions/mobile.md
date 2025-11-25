@@ -89,6 +89,13 @@ Le balcon inférieur dessert les chambres situées au sud, au nord et à l’est
 
 Deux des trois chambres disposent d’un décrochement permettant d’installer un lit double tout en conservant un espace de circulation confortable. De grandes fenêtres apportent une belle luminosité naturelle.
 
+# Chambre polyvalente
+
+📐 12 m²
+
+Cette chambre est délimitée par une paroi vitrée mobile, ce qui permet de faire évoluer facilement l’usage de la pièce. Elle peut accueillir une chambre d’amis, un bureau, un second salon, un espace de jeu pour les enfants ou même une salle multimédia.
+La grande fenêtre offre une belle lumière naturelle, créant une atmosphère agréable et accueillante.
+
 
 
 ## Salle de bain parentale
@@ -106,6 +113,7 @@ La douche est spacieuse, équipée d’une paroi en verre fixe et d’une porte 
 📐 9 m²
 
 Cette seconde salle de bain dispose d’une baignoire avec paroi vitrée — pratique pour les douches des enfants si nécessaire — ainsi que d’un lavabo simple en Corian. Elle est également équipée d’une machine à laver Bosch et d’un séchoir Bosch Série 8.
+
 
 
 # Contact 

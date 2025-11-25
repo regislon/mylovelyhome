@@ -1479,6 +1479,30 @@ function showError(message) {
   document.getElementById('top-menu').style.display = 'none';
 }
 
+// Setup splash screen
+function setupSplashScreen() {
+  const splashScreen = document.getElementById('splash-screen');
+  const splashOkBtn = document.getElementById('splash-ok-btn');
+
+  if (splashOkBtn) {
+    splashOkBtn.addEventListener('click', () => {
+      if (splashScreen) {
+        splashScreen.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+          splashScreen.style.display = 'none';
+        }, 300);
+      }
+    });
+  }
+}
+
+// Setup splash screen immediately
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupSplashScreen);
+} else {
+  setupSplashScreen();
+}
+
 // Start the application when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);

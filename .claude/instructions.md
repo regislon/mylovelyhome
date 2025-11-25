@@ -245,10 +245,13 @@ below the top line:
 * Apply configuration settings (zoom level, pitch limits, transition duration).
 
 
+## **7.3 splash screen**
 
+on both mobile and desktop version, add a splash screen when the page is fisrt loaded, displaying this texre
 
+here is the text : "Les travaux seront terminés début 2026. Les images et panoramas ont été capturés il y a quelques semaines et ne reflètent pas l’état final de l’appartement."
 
----
+add a ok button to close the splash screen and access the application.
 
 ## **8. Deployment Requirements**
 

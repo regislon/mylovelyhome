@@ -344,6 +344,15 @@ body {
   }
 }
 
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 /* Close button */
 .markdown-close-btn {
   position: absolute;
@@ -480,6 +489,65 @@ body {
   color: #000;
   display: inline-block;
   font-size: 1.1em;
+}
+
+/* Splash Screen */
+.splash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.splash-content {
+  background: #fff;
+  max-width: 600px;
+  width: 100%;
+  padding: 40px 50px;
+  border: 3px solid #000;
+  text-align: center;
+  animation: slideUp 0.4s ease-out;
+}
+
+.splash-text {
+  font-size: 1.1em;
+  line-height: 1.7;
+  color: #000;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.splash-ok-button {
+  padding: 12px 40px;
+  font-size: 1.1em;
+  font-weight: 600;
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.splash-ok-button:hover {
+  background-color: #fff;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.splash-ok-button:active {
+  transform: translateY(0);
 }
 
 /* Modal popup for help */
@@ -645,5 +713,24 @@ body {
     width: 36px;
     height: 36px;
     font-size: 20px;
+  }
+
+  /* Splash screen adjustments for mobile */
+  .splash-overlay {
+    padding: 15px;
+  }
+
+  .splash-content {
+    padding: 30px 25px;
+  }
+
+  .splash-text {
+    font-size: 1em;
+    margin-bottom: 25px;
+  }
+
+  .splash-ok-button {
+    padding: 10px 30px;
+    font-size: 1em;
   }
 }
