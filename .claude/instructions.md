@@ -163,7 +163,7 @@ Translation strings support placeholders using `{variable}` syntax:
 
 ---
 
-## **5. Navigation Behavior**
+## **5. Navigation Behavior for no mobile devices**
 
 ### **Top Menu**
 
@@ -211,7 +211,15 @@ markdown description:
 * Make a nice layout for the text and images. 
 
 
+## **6. Navigation Behavior for mobile devices (small screen)**
+top part of the screen (pne line):
+* the application is composed of one dropdown menu at the top of the windows that contain the lis of panoramas from assets.csv . Name the value <floor_name> <column name_fr> to populate the dropdown.
+* a home botton that when clicked display the image descriptions/mobile.md bellow
 
+below the top line:
+* Bellow the dropdown menu, we can have : 
+  - descriptions/mobile.md
+  - the 360° viewer must be displayed, taking all the remaining space of the screen.
 
 
 

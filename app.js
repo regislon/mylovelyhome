@@ -14,6 +14,7 @@ let currentFloorPlanLevel = null;
 let allAreas = []; // All areas from areas.csv
 let currentViewMode = 'panorama'; // 'panorama' or 'area'
 let selectedAreaId = null; // Currently selected area ID
+let isMobileView = false; // Track if we're in mobile mode
 
 // Translation state
 let translations = {};
@@ -33,7 +34,13 @@ const floorPlanTitle = document.getElementById('floor-plan-title');
 const floorPlanContainer = document.getElementById('floor-plan-container');
 const generalDescriptionBtn = document.getElementById('general-description-btn');
 const helpBtn = document.getElementById('help-btn');
+const mobileNav = document.getElementById('mobile-nav');
+const mobilePanoramaSelect = document.getElementById('mobile-panorama-select');
+const mobileHomeBtn = document.getElementById('mobile-home-btn');
+const topMenu = document.getElementById('top-menu');
+const mainContent = document.getElementById('main-content');
 let initialImageContainer = null;
+let mobileDescriptionContainer = null;
 
 // SVG elements for floor plan
 let floorPlanSvg = null;
@@ -64,6 +71,42 @@ function t(key, placeholders = {}) {
   return value.replace(/\{(\w+)\}/g, (match, placeholder) => {
     return placeholders[placeholder] !== undefined ? placeholders[placeholder] : match;
   });
+}
+
+// Check if device is mobile (small screen)
+function checkMobileView() {
+  return window.innerWidth <= 768;
+}
+
+// Update layout based on mobile/desktop view
+function updateLayoutForViewport() {
+  const wasMobile = isMobileView;
+  isMobileView = checkMobileView();
+
+  if (isMobileView === wasMobile) return; // No change
+
+  if (isMobileView) {
+    // Switch to mobile layout
+    console.log('Switching to mobile layout');
+    topMenu.style.display = 'none';
+    mobileNav.style.display = 'flex';
+
+    // Populate mobile dropdown if not already done
+    if (mobilePanoramaSelect.options.length === 0) {
+      populateMobilePanoramaSelect();
+    }
+  } else {
+    // Switch to desktop layout
+    console.log('Switching to desktop layout');
+    topMenu.style.display = 'block';
+    mainContent.style.display = 'flex';
+    mobileNav.style.display = 'none';
+
+    // Hide mobile description if showing
+    if (mobileDescriptionContainer) {
+      mobileDescriptionContainer.style.display = 'none';
+    }
+  }
 }
 
 // Load configuration from JSON file
@@ -215,9 +258,16 @@ async function init() {
     setupFloorPlanClickListener();
     setupGeneralDescriptionListener();
     setupHelpButtonListener();
+    setupMobileNavigationListeners();
 
     // Initialize UI text
     updateUIText();
+
+    // Setup viewport change listener
+    window.addEventListener('resize', updateLayoutForViewport);
+
+    // Initial viewport check and layout update
+    updateLayoutForViewport();
 
     // Load default floor plan (first level)
     if (validPanoramas.length > 0 && validPanoramas[0].level) {
@@ -225,10 +275,14 @@ async function init() {
       loadFloorPlan(currentLevel);
     }
 
-    // Show initial image instead of loading first panorama
-    showInitialImage();
-
-    showLoading(false);
+    // Show initial image or mobile description instead of loading first panorama
+    if (isMobileView) {
+      showLoading(false);
+      loadMobileDescription();
+    } else {
+      showInitialImage();
+      showLoading(false);
+    }
   } catch (error) {
     console.error('Initialization error:', error);
     showError(t('failedToInitialize', { error: error.message }));
@@ -326,6 +380,36 @@ function populatePanoramaSelect() {
   });
 }
 
+// Populate mobile panorama dropdown with format: <floor_name> <name_fr>
+function populateMobilePanoramaSelect() {
+  mobilePanoramaSelect.innerHTML = '';
+
+  validPanoramas.forEach((panorama, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+
+    // Get floor name translation
+    const levelKey = panorama.level.charAt(0).toUpperCase() + panorama.level.slice(1);
+    const floorName = translations[currentLanguage] && translations[currentLanguage][levelKey]
+                      ? t(levelKey)
+                      : levelKey;
+
+    // Get panorama name (prefer language-specific)
+    const panoramaName = (currentLanguage === 'fr' ? panorama.name_fr : panorama.name_en)
+                        || panorama.name_en || panorama.name_fr || panorama.file_path;
+
+    // Format as: <floor_name> <panorama_name>
+    option.textContent = `${floorName} - ${panoramaName}`;
+
+    // Mark as selected if it's the current panorama
+    if (index === currentPanoramaIndex) {
+      option.selected = true;
+    }
+
+    mobilePanoramaSelect.appendChild(option);
+  });
+}
+
 // Setup level buttons listener
 function setupLevelButtonsListener() {
   levelButtons.addEventListener('click', (event) => {
@@ -401,6 +485,23 @@ function setupGeneralDescriptionListener() {
 function setupHelpButtonListener() {
   helpBtn.addEventListener('click', () => {
     loadHelpDescription();
+  });
+}
+
+// Setup mobile navigation listeners
+function setupMobileNavigationListeners() {
+  // Mobile panorama select listener
+  mobilePanoramaSelect.addEventListener('change', (event) => {
+    const selectedIndex = parseInt(event.target.value, 10);
+    if (!isNaN(selectedIndex) && selectedIndex >= 0 && selectedIndex < validPanoramas.length) {
+      showMobilePanoramaViewer();
+      loadPanorama(selectedIndex);
+    }
+  });
+
+  // Mobile home button listener
+  mobileHomeBtn.addEventListener('click', () => {
+    loadMobileDescription();
   });
 }
 
@@ -541,6 +642,61 @@ async function loadHelpDescription() {
 
   // Add modal to page
   document.body.appendChild(modalOverlay);
+}
+
+// Load and display mobile description from mobile.md
+async function loadMobileDescription() {
+  console.log('Loading mobile description');
+
+  // Hide viewer, show mobile description
+  viewerContainer.style.display = 'none';
+
+  // Create or get mobile description container
+  if (!mobileDescriptionContainer) {
+    mobileDescriptionContainer = document.createElement('div');
+    mobileDescriptionContainer.id = 'mobile-description-container';
+    mobileDescriptionContainer.style.cssText = `
+      width: 100%;
+      height: calc(100vh - 60px);
+      padding: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      background: white;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    `;
+    document.getElementById('app').appendChild(mobileDescriptionContainer);
+  }
+  mobileDescriptionContainer.style.display = 'block';
+
+  // Load mobile.md file
+  try {
+    const response = await fetch('descriptions/mobile.md');
+    if (response.ok) {
+      const markdown = await response.text();
+      const html = convertMarkdownToHTML(markdown, 'descriptions/');
+      mobileDescriptionContainer.innerHTML = `
+        <div class="markdown-content">
+          ${html}
+        </div>
+      `;
+    } else {
+      mobileDescriptionContainer.innerHTML = `<p>${t('area.descriptionNotFound', { file: 'descriptions/mobile.md' })}</p>`;
+    }
+  } catch (error) {
+    console.error('Failed to load mobile description:', error);
+    mobileDescriptionContainer.innerHTML = `<p>${t('area.errorLoading')}</p>`;
+  }
+}
+
+// Show panorama viewer on mobile (hide description)
+function showMobilePanoramaViewer() {
+  if (mobileDescriptionContainer) {
+    mobileDescriptionContainer.style.display = 'none';
+  }
+  viewerContainer.style.display = 'block';
 }
 
 // Setup floor plan SVG click listener
@@ -863,8 +1019,15 @@ function loadPanorama(index) {
   currentPanoramaIndex = index;
   const panorama = validPanoramas[index];
 
-  // Load floor plan for panorama's level
-  loadFloorPlan(panorama.level);
+  // Update mobile dropdown if in mobile view
+  if (isMobileView && mobilePanoramaSelect.options.length > 0) {
+    mobilePanoramaSelect.value = index;
+  }
+
+  // Load floor plan for panorama's level (only if not in mobile view)
+  if (!isMobileView) {
+    loadFloorPlan(panorama.level);
+  }
 
   console.log('Loading panorama:', panorama.file_path);
 

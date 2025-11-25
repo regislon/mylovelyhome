@@ -1,5 +1,5 @@
 file_path,position_x,position_y,orientation,level,name_fr,name_en
-./assets/attique.jpg,292.19873,351,100,level2,Attique,Attic
+./assets/attique.jpg,292.19873,351,100,level2,Salon,Attic
 ./assets/chambre_nord_est.jpg,433.38361,356.53394,90,level1,Chambre nord-est,North-east bedroom
 ./assets/chambre_nord_ouest.jpg,113.15091,358.08023,90,level1,Chambre nord-ouest,North-west bedroom
 ./assets/chambre_sud_est.jpg,330.09271,659.29376,90,level1,Chambre sud-est,South-east bedroom
@@ -16,7 +16,7 @@ file_path,position_x,position_y,orientation,level,name_fr,name_en
 ./assets/terrasse_1er_ouest.jpg,522.75806,1063.0251,90,level1,Terrasse 1er ouest,First floor terrace â west
 ./assets/terrasse_attique_est.jpg,565.16492,1019,90,level2,Terrasse attique est,Attic terrace â east
 ./assets/terrasse_attique_ouest.jpg,48.831245,1019,0,level2,Terrasse attique ouest,Attic terrace âwest
-./assets/terrasse_attique_ouest.jpg,409.49747,128.30936,0,level2,Toilette,Toilet
+./assets/terrasse_attique_ouest.jpg,409.49747,128.30936,0,level2,Toilette attique,Toilet
 ,,,,,,
 ,,,,,,
 ,,,,,,
