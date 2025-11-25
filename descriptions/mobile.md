@@ -109,5 +109,5 @@ Cette seconde salle de bain dispose d’une baignoire avec paroi vitrée — pra
 
 
 # Contact 
-Pour toute question ou pour organiser une visite, n’hésitez pas à me contacter : villardiez8@lonco.ch
+Pour toute question ou pour organiser une visite, n’hésitez pas à nous contacter : villardiez8@lonco.ch
 

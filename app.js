@@ -384,6 +384,14 @@ function populatePanoramaSelect() {
 function populateMobilePanoramaSelect() {
   mobilePanoramaSelect.innerHTML = '';
 
+  // Add default placeholder option
+  const placeholderOption = document.createElement('option');
+  placeholderOption.value = '';
+  placeholderOption.textContent = currentLanguage === 'fr' ? 'Sélectionner un panorama' : 'Select panorama';
+  placeholderOption.selected = true;
+  placeholderOption.disabled = true;
+  mobilePanoramaSelect.appendChild(placeholderOption);
+
   validPanoramas.forEach((panorama, index) => {
     const option = document.createElement('option');
     option.value = index;
@@ -400,11 +408,6 @@ function populateMobilePanoramaSelect() {
 
     // Format as: <floor_name> <panorama_name>
     option.textContent = `${floorName} - ${panoramaName}`;
-
-    // Mark as selected if it's the current panorama
-    if (index === currentPanoramaIndex) {
-      option.selected = true;
-    }
 
     mobilePanoramaSelect.appendChild(option);
   });
@@ -501,6 +504,8 @@ function setupMobileNavigationListeners() {
 
   // Mobile home button listener
   mobileHomeBtn.addEventListener('click', () => {
+    // Reset dropdown to placeholder
+    mobilePanoramaSelect.value = '';
     loadMobileDescription();
   });
 }
