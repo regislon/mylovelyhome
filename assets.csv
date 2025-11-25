@@ -4,22 +4,16 @@ file_path,position_x,position_y,orientation,level,name_fr,name_en
 ./assets/chambre_nord_ouest.jpg,113.15091,358.08023,90,level1,Chambre nord-ouest,North-west bedroom
 ./assets/chambre_sud_est.jpg,330.09271,659.29376,90,level1,Chambre sud-est,South-east bedroom
 ./assets/chambre_sud_ouest.jpg,187.52654,833.40387,90,level1,Chambre sud-ouest,South-west bedroom
-./assets/couloir_1er_nord.jpg,277.82877,200.82877,90,level1,Couloir 1er‚ nord,First floor corridor ‚north
-./assets/couloir_1er_sud.jpg,256.49023,537.9115,90,level1,"Couloir 1er, sud",First floor corridor ‚south
-./assets/entree.jpg,44.875012,299.64455,90,level0,Entrée,Entrance
+./assets/couloir_1er_nord.jpg,277.82877,200.82877,90,level1,Couloir 1er nord,First floor corridor - north
+./assets/couloir_1er_sud.jpg,256.49023,537.9115,90,level1,Couloir 1er sud,First floor corridor - south
+./assets/entree.jpg,44.875012,299.64455,90,level0,Entr√©e,Entrance
 ./assets/escalier_attique.jpg,364.55121,117.89499,90,level2,Escalier attique,Attic staircase
-./assets/escalier_entree.jpg,339.52496,93.358643,90,level1,Escalier entrée,Entrance staircase
-./assets/reduit_attique.jpg,165.58186,182.57373,90,level2,Réduit attique,Attic storage
+./assets/escalier_entree.jpg,339.52496,93.358643,90,level1,Escalier entr√©e,Entrance staircase
+./assets/reduit_attique.jpg,165.58186,182.57373,90,level2,R√©duit attique,Attic storage
 ./assets/salle_de_bain_est.jpg,427.35315,108.5121,90,level1,Salle de bain est,East bathroom
 ./assets/salle_de_bain_ouest.jpg,127.22198,152.89008,90,level1,Salle de bain ouest,West bathroom
-./assets/terrasse_1er_est.jpg,49.289921,1063.9529,90,level1,Terrasse 1er est,First floor terrace ‚ east
-./assets/terrasse_1er_ouest.jpg,522.75806,1063.0251,90,level1,Terrasse 1er ouest,First floor terrace ‚ west
-./assets/terrasse_attique_est.jpg,565.16492,1019,90,level2,Terrasse attique est,Attic terrace ‚ east
-./assets/terrasse_attique_ouest.jpg,48.831245,1019,0,level2,Terrasse attique ouest,Attic terrace ‚west
+./assets/terrasse_1er_est.jpg,49.289921,1063.9529,90,level1,Terrasse 1er est,First floor terrace - east
+./assets/terrasse_1er_ouest.jpg,522.75806,1063.0251,90,level1,Terrasse 1er ouest,First floor terrace - west
+./assets/terrasse_attique_est.jpg,565.16492,1019,90,level2,Terrasse attique est,Attic terrace - east
+./assets/terrasse_attique_ouest.jpg,48.831245,1019,0,level2,Terrasse attique ouest,Attic terrace - west
 ./assets/terrasse_attique_ouest.jpg,409.49747,128.30936,0,level2,Toilette attique,Toilet
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,,,,,
-,,",",,,,
