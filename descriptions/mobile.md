@@ -89,9 +89,9 @@ Le balcon inférieur dessert les chambres situées au sud, au nord et à l’est
 
 Deux des trois chambres disposent d’un décrochement permettant d’installer un lit double tout en conservant un espace de circulation confortable. De grandes fenêtres apportent une belle luminosité naturelle.
 
-# Chambre polyvalente
+## Chambre polyvalente
 
-📐 12 m²
+📐 14 m²
 
 Cette chambre est délimitée par une paroi vitrée mobile, ce qui permet de faire évoluer facilement l’usage de la pièce. Elle peut accueillir une chambre d’amis, un bureau, un second salon, un espace de jeu pour les enfants ou même une salle multimédia.
 La grande fenêtre offre une belle lumière naturelle, créant une atmosphère agréable et accueillante.

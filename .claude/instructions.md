@@ -195,7 +195,7 @@ a on the floor plan must rotate accordingly to reflect the current orientation.
 
 ### **Right Panel: 360° Viewer with Navigation Hotspots, and Markdown Description**
 
-* When the page is first loaded, the image ./assets/ext.png must be displayed in the right panel. the image must be fully visible, it size be adjusted to fit the panel size.
+* When the page is first loaded, the image ./descriptions/main.md must be displayed in the right panel.
 * When a panorama is displayed, the application must check which directional links are available.
 * For each available direction, the viewer must create a **navigation hotspot** or arrow.
 * Clicking a hotspot loads the linked panorama.

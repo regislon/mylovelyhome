@@ -275,12 +275,12 @@ async function init() {
       loadFloorPlan(currentLevel);
     }
 
-    // Show initial image or mobile description instead of loading first panorama
+    // Show initial content: mobile description or main.md for non-mobile
     if (isMobileView) {
       showLoading(false);
       loadMobileDescription();
     } else {
-      showInitialImage();
+      await loadGeneralDescription();
       showLoading(false);
     }
   } catch (error) {
