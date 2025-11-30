@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,17 +12,21 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- Splash Screen -->
   <div id="splash-screen" class="splash-overlay">
     <div class="splash-content">
-      <p class="splash-text">Les travaux seront terminés début 2026. Les images et panoramas ont été capturés il y a quelques semaines et ne reflètent pas l'état actuel et final de l'appartement.</p>
+      <p class="splash-text"><b>Mise en location : dès février 2025.</b> <br> Les images ont été prises il y a quelques
+        semaines et ne reflètent pas l'état actuel et final de l'appartement. Les images sont des panoramas, vous pouvez
+        naviguer à l'intérieur. <br> villardiez8@lonco.ch</p>
       <button id="splash-ok-btn" class="splash-ok-button">OK</button>
     </div>
   </div>
 
   <div id="app">
-    <!-- Help Button -->
+    <!-- Contact Email and Help Button -->
+    <div id="contact-email">villardiez8@lonco.ch</div>
     <button id="help-btn" class="help-button" title="Aide">?</button>
 
     <!-- Mobile Top Navigation (shown only on mobile) -->
@@ -35,6 +40,7 @@
       <div id="controls">
         <label id="level-label">Floor:</label>
         <div id="level-buttons"></div>
+        <select id="panorama-select"></select>
         <button id="general-description-btn" class="level-button">Description générale</button>
       </div>
     </div>
@@ -77,4 +83,5 @@
   <!-- Application script -->
   <script src="app.js" type="module"></script>
 </body>
+
 </html>

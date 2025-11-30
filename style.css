@@ -138,6 +138,26 @@ body {
   z-index: 100;
 }
 
+/* Contact email next to help button */
+#contact-email {
+  position: fixed;
+  top: 20px;
+  right: 70px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.8;
+  z-index: 200;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 10px 15px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  box-sizing: border-box;
+}
+
 #controls {
   display: flex;
   align-items: center;
@@ -186,6 +206,37 @@ body {
 
 .level-button:active {
   transform: translateY(0);
+}
+
+/* Panorama select dropdown */
+#panorama-select {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  border-radius: 4px;
+  min-width: 200px;
+}
+
+#panorama-select option {
+  background-color: #1a1a1a;
+  color: #fff;
+  padding: 8px;
+}
+
+#panorama-select:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+#panorama-select:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 /* General description button - add spacing */
@@ -691,6 +742,10 @@ body {
   }
 
   .help-button {
+    display: none !important;
+  }
+
+  #contact-email {
     display: none !important;
   }
 

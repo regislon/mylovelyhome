@@ -170,6 +170,8 @@ Translation strings support placeholders using `{variable}` syntax:
 * A top menu must include one button for each floor level found in the CSV. only one floor can be selected at a time.
 * Add a button "description générale" that when clicked display the main description from descriptions/main.md in the right panel.
 * in the top right corner, add a button "?" that when clicked display the help description from descriptions/help.md as popup window in the middle of the screen. 
+- add the text "villardiez8@lonco.ch" in same level as the button "?", just on its left.
+* add a dropdown menu that allow to jump directly to any panorama. The value of each option must be "<floor_name> <column name_fr>" . The list must be ordered by alphabetical order, but "Attique" first, them "1er étage".
 * No other button should be present
 
 
@@ -213,7 +215,7 @@ markdown description:
 
 ## **6. Navigation Behavior for mobile devices (small screen)**
 top part of the screen (pne line):
-* the application is composed of one dropdown menu at the top of the windows that contain the lis of panoramas from assets.csv . Name the value <floor_name> <column name_fr> to populate the dropdown.
+* the application is composed of one dropdown menu at the top of the windows that contain the lis of panoramas from assets.csv . Name the value <floor_name> <column name_fr> to populate the dropdown. order the list by alphabetical order, but "Attique" first, them "1er étage" .
 * a home botton that when clicked display the image descriptions/mobile.md bellow
 
 below the top line:

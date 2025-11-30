@@ -37,6 +37,7 @@ const helpBtn = document.getElementById('help-btn');
 const mobileNav = document.getElementById('mobile-nav');
 const mobilePanoramaSelect = document.getElementById('mobile-panorama-select');
 const mobileHomeBtn = document.getElementById('mobile-home-btn');
+const panoramaSelect = document.getElementById('panorama-select');
 const topMenu = document.getElementById('top-menu');
 const mainContent = document.getElementById('main-content');
 let initialImageContainer = null;
@@ -162,6 +163,8 @@ function updateUIText() {
 
   // Update controls
   populateLevelButtons();
+  populatePanoramaSelect();
+  populateMobilePanoramaSelect();
 
   // Update floor plan title if a level is loaded
   if (currentFloorPlanLevel) {
@@ -252,9 +255,11 @@ async function init() {
 
     // Populate controls
     populateLevelButtons();
+    populatePanoramaSelect();
 
     // Setup event listeners
     setupLevelButtonsListener();
+    setupPanoramaSelectListener();
     setupFloorPlanClickListener();
     setupGeneralDescriptionListener();
     setupHelpButtonListener();
@@ -369,12 +374,49 @@ function populateLevelButtons() {
 function populatePanoramaSelect() {
   panoramaSelect.innerHTML = `<option value="">${t('selectLocation')}</option>`;
 
-  validPanoramas.forEach((panorama, index) => {
+  // Create array of panoramas with their display names for sorting
+  const panoramasWithNames = validPanoramas.map((panorama, index) => {
+    // Get floor name translation
+    const levelKey = panorama.level.charAt(0).toUpperCase() + panorama.level.slice(1);
+    const floorName = translations[currentLanguage] && translations[currentLanguage][levelKey]
+                      ? t(levelKey)
+                      : levelKey;
+
+    // Use language-specific name (prefer French for name_fr column requirement)
+    const panoramaName = panorama.name_fr || panorama.name_en || panorama.file_path;
+
+    // Format as: <floor_name> <name_fr>
+    const displayName = `${floorName} ${panoramaName}`;
+
+    return { index, displayName, level: panorama.level, panoramaName };
+  });
+
+  // Custom sort: Attique (level2) first, then 1er étage (level1), then others
+  // Within each level, sort alphabetically by panorama name
+  panoramasWithNames.sort((a, b) => {
+    // Define level priority: level2 (Attique) = 0, level1 (1er étage) = 1, level0 = 2
+    const levelPriority = {
+      'level2': 0,
+      'level1': 1,
+      'level0': 2
+    };
+    
+    const aPriority = levelPriority[a.level] !== undefined ? levelPriority[a.level] : 999;
+    const bPriority = levelPriority[b.level] !== undefined ? levelPriority[b.level] : 999;
+    
+    // First sort by level priority
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority;
+    }
+    
+    // Within same level, sort alphabetically by panorama name
+    return a.panoramaName.localeCompare(b.panoramaName);
+  });
+
+  // Create options in sorted order
+  panoramasWithNames.forEach(({ index, displayName }) => {
     const option = document.createElement('option');
     option.value = index;
-    // Use language-specific name based on current language
-    const displayName = (currentLanguage === 'fr' ? panorama.name_fr : panorama.name_en)
-                        || panorama.name_en || panorama.name_fr || panorama.file_path;
     option.textContent = displayName;
     panoramaSelect.appendChild(option);
   });
@@ -392,10 +434,8 @@ function populateMobilePanoramaSelect() {
   placeholderOption.disabled = true;
   mobilePanoramaSelect.appendChild(placeholderOption);
 
-  validPanoramas.forEach((panorama, index) => {
-    const option = document.createElement('option');
-    option.value = index;
-
+  // Create array of panoramas with their display names for sorting
+  const panoramasWithNames = validPanoramas.map((panorama, index) => {
     // Get floor name translation
     const levelKey = panorama.level.charAt(0).toUpperCase() + panorama.level.slice(1);
     const floorName = translations[currentLanguage] && translations[currentLanguage][levelKey]
@@ -406,9 +446,39 @@ function populateMobilePanoramaSelect() {
     const panoramaName = (currentLanguage === 'fr' ? panorama.name_fr : panorama.name_en)
                         || panorama.name_en || panorama.name_fr || panorama.file_path;
 
-    // Format as: <floor_name> <panorama_name>
-    option.textContent = `${floorName} - ${panoramaName}`;
+    // Format as: <floor_name> - <panorama_name>
+    const displayName = `${floorName} - ${panoramaName}`;
 
+    return { panorama, index, displayName, level: panorama.level, panoramaName };
+  });
+
+  // Custom sort: Attique (level2) first, then 1er étage (level1), then others
+  // Within each level, sort alphabetically by panorama name
+  panoramasWithNames.sort((a, b) => {
+    // Define level priority: level2 (Attique) = 0, level1 (1er étage) = 1, level0 = 2
+    const levelPriority = {
+      'level2': 0,
+      'level1': 1,
+      'level0': 2
+    };
+    
+    const aPriority = levelPriority[a.level] !== undefined ? levelPriority[a.level] : 999;
+    const bPriority = levelPriority[b.level] !== undefined ? levelPriority[b.level] : 999;
+    
+    // First sort by level priority
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority;
+    }
+    
+    // Within same level, sort alphabetically by panorama name
+    return a.panoramaName.localeCompare(b.panoramaName);
+  });
+
+  // Create options in sorted order
+  panoramasWithNames.forEach(({ index, displayName }) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = displayName;
     mobilePanoramaSelect.appendChild(option);
   });
 }
@@ -1024,9 +1094,12 @@ function loadPanorama(index) {
   currentPanoramaIndex = index;
   const panorama = validPanoramas[index];
 
-  // Update mobile dropdown if in mobile view
+  // Update dropdowns
   if (isMobileView && mobilePanoramaSelect.options.length > 0) {
     mobilePanoramaSelect.value = index;
+  }
+  if (!isMobileView && panoramaSelect.options.length > 0) {
+    panoramaSelect.value = index;
   }
 
   // Load floor plan for panorama's level (only if not in mobile view)
