@@ -47,7 +47,7 @@ Cette pièce située au dernier étage offre une vue dégagée sur les environs.
 La cuisine, est de marque **Valcucine**, est équipée d’un plan de travail en granit d’environ 4 mètres, intégrant la zone de cuisson. Elle dispose également d’un espace repas pouvant accueillir jusqu’à six personnes, idéal aussi bien pour le quotidien que pour partager des moments conviviaux.
 
 ![alt text](image-9.png)
-
+![alt text](image-10.png)
 
 
 **Équipements électroménagers**
@@ -75,6 +75,11 @@ Il abrite également l’arrivée de la fibre optique, qui est distribuée dans 
 
 La terrasse de l’attique, exposée plein sud, offre une très belle vue et un véritable espace de détente façon rooftop — les photos parlent d’elles-mêmes.
 
+![alt text](image-11.png)
+![alt text](image-12.png)
+[Petite vidéo YouTube](https://youtube.com/shorts/pIaGupLhCdc?si=BJ8W3zsVM0GhJPaA)
+
+
 ## Balcon Inférieur
 
 📐 46 m²
@@ -87,6 +92,9 @@ Le balcon inférieur dessert les chambres situées au sud, au nord et à l’est
 📐 14 m² - 15 m² et 16 m²
 
 Deux des trois chambres disposent d’un décrochement permettant d’installer un lit double tout en conservant un espace de circulation confortable. De grandes fenêtres apportent une belle luminosité naturelle.
+
+![alt text](image-15.png)
+![alt text](image-16.png)
 
 ## Chambre polyvalente
 
@@ -113,6 +121,7 @@ La douche est spacieuse, équipée d’une paroi en verre fixe et d’une porte 
 
 Cette seconde salle de bain dispose d’une baignoire avec paroi vitrée — pratique pour les douches des enfants si nécessaire — ainsi que d’un lavabo simple en Corian. Elle est également équipée d’une machine à laver Bosch et d’un séchoir Bosch Série 8.
 
+![alt text](image-14.png)
 
 
 # Contact 
