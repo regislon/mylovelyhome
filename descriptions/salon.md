@@ -9,6 +9,8 @@ La cuisine, est de marque **Valcucine**, est équipée d’un plan de travail en
 ![alt text](image-1.png)
 ![alt text](image-2.png)
 
+![alt text](image-9.png)
+![alt text](image-10.png)
 
 
 
@@ -18,6 +20,7 @@ L’ensemble de l’électroménager appartient à la gamme **Siemens IQ700** et
 
 - une table à induction avec ventilation intégrée,
 - un réfrigérateur,
+- un congélateur,
 - un lave-vaisselle,
 - un four combiné (air chaud + micro-ondes),
 - un four vapeur combiné,
