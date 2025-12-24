@@ -6,7 +6,7 @@ Situé dans une PPE de trois appartements, ce 5,5 pièces en attique offre une t
 Le chauffage est assuré par une pompe à chaleur (PAC). L’appartement dispose également d’un garage double (sans accès direct à l’immeuble).
 Construction neuve de 2026 (livraison prévue en janvier). L’immeuble ne dispose pas d’ascenseur, mais l’accès se fait de plain-pied.
 
-📐 Surface habitable : 165 m²
+📐 Surface habitable : 150 m²
 📐 Surface terrasse : 99 m²
 
 
@@ -38,9 +38,8 @@ Cette pièce située au dernier étage offre une vue dégagée sur les environs.
 
 La cuisine, est de marque **Valcucine**, est équipée d’un plan de travail en granit d’environ 4 mètres, intégrant la zone de cuisson. Elle dispose également d’un espace repas pouvant accueillir jusqu’à six personnes, idéal aussi bien pour le quotidien que pour partager des moments conviviaux.
 
-![alt text](image-1.png)
-![alt text](image-2.png)
 
+![alt text](image-9.png)
 
 
 **Équipements électroménagers**
@@ -49,6 +48,7 @@ L’ensemble de l’électroménager appartient à la gamme **Siemens IQ700** et
 
 - une table à induction avec ventilation intégrée,
 - un réfrigérateur,
+- un congélateur,
 - un lave-vaisselle,
 - un four combiné (air chaud + micro-ondes),
 - un four vapeur combiné,
